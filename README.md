@@ -4,18 +4,40 @@ We developed LINS, a general medical Q&A framework that can seamlessly adapt to 
 
 ![paper](./assets/LINS.png)
 
-<h2>Documentation</h2>
+# Documentation 
+
 LINS comes with different functionalities.
 
-**Keyword Extraction
+- [**Keyword Extraction**](#keyword-extraction)
+- [**Retrieve Evidence**](#retrieve-evidence)
+- [**Direct Multi-Round Q&A**](#direct-multi-round-qa)
+- [**Original Retrieval-Augmented Generation**](#original-retrieval-augmented-generation)
+- [**Multi-Agent Iterative Retrieval-Augmented Generation**](#multi-agent-iterative-retrieval-augmented-generation)
+- [**Integrate Local Knowledge Base for Answering**](#integrate-local-knowledge-base-for-answering)
 
-**Retrieve Evidence
+## Environmental Preparation
 
-**Direct Multi-Round Q&A
+## Keyword Extraction
 
-**Original Retrieval-Augmented Generation
+Content for keyword extraction...
 
-**Multi-Agent Iterative Retrieval-Augmented Generation
+## Retrieve Evidence
 
-**Integrate Local Knowledge Base for Answering
+Content for retrieve evidence...
+
+## Direct Multi-Round Q&A
+
+Content for direct multi-round Q&A...
+
+## Original Retrieval-Augmented Generation
+
+Content for original retrieval-augmented generation...
+
+## Multi-Agent Iterative Retrieval-Augmented Generation
+
+Content for multi-agent iterative retrieval-augmented generation...
+
+## Integrate Local Knowledge Base for Answering
+
+Content for integrate local knowledge base for answering...
 
