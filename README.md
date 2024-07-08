@@ -6,10 +6,16 @@ We developed LINS, a general medical Q&A framework that can seamlessly adapt to 
 
 <h2>Documentation</h2>
 LINS comes with different functionalities.
+
 ** Keyword Extraction
+
 ** Retrieve Evidence
+
 ** Direct Multi-Round Q&A
+
 ** Original Retrieval-Augmented Generation
+
 ** Multi-Agent Iterative Retrieval-Augmented Generation
+
 ** Integrate Local Knowledge Base for Answering
 
