@@ -17,6 +17,32 @@ LINS comes with different functionalities.
 
 ## Environmental Preparation
 
+Clone this repo, and install python requirements.
+
+```bash
+pip install -r requirements.txt
+```
+
+Install Nodejs.
+
+```bash
+apt install nodejs # If you use Ubuntu
+```
+
+Prepare SerpAPI Key
+
+If you wants to use SerpAPI to get search results. You need to get a SerpAPI key from [here](https://serpapi.com/).
+
+Then, set the environment variable `SERPAPI_KEY` to your key.
+
+```bash
+export SERPAPI_KEY="YOUR KEY"
+```
+
+## Model Preparation
+
+The Qwen model can be found at [https://huggingface.co/Qwen/Qwen1.5-110B](https://huggingface.co/Qwen/Qwen1.5-110B), the recall model for the retriever at [https://huggingface.co/BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3),and the ranking model at [https://huggingface.co/BAAI/bge-reranker-v2-m3](https://huggingface.co/BAAI/bge-reranker-v2-m3). Finally, the T5 model is accessible at [https://huggingface.co/google-t5/t5-11b](https://huggingface.co/google-t5/t5-11b).
+
 ## Keyword Extraction
 
 Content for keyword extraction...
