@@ -1,6 +1,8 @@
 <h1> LINS: A Professional Medical Q&A Framework for Enhancing Knowledge Privacy and Timeliness</h1>
 
-We developed LINS, a general medical Q&A framework that can seamlessly adapt to any medical field without additional training or fine-tuning. We introduced the Multi-Agent Iterative Retrieval Augmented Generation (MAIRAG) algorithm and the Keyword Extraction Degradation (KED) algorithm to help LINS generate Citation-Based Generative Text (CBGT). LINS achieved state-of-the-art (SOTA) performance in both subjective and objective evaluations on specialized medical datasets. Additionally, LINS supports keyword extraction, retrieval of the latest knowledge, and assists in evidence-based medical practice. It can also easily integrate with local knowledge bases without additional training or fine-tuning. In summary, LINS is a multifunctional, highly professional, privacy-protecting, and up-to-date medical Q&A framework with broad application value in the medical field. It is expected to promote the application and development of large language models in medicine, thereby improving the efficiency of related professionals.
+<div align="justify">
+We developed LINS, a general medical Q&A framework that can seamlessly adapt to any medical field without additional training or fine-tuning. We introduced the Multi-Agent Iterative Retrieval Augmented Generation (MAIRAG) algorithm and the Keyword Extraction Degradation (KED) algorithm to help LINS generate Citation-Based Generative Text (CBGT). LINS achieved state-of-the-art (SOTA) performance in both subjective and objective evaluations on specialized medical datasets. Additionally, LINS supports keyword extraction, retrieval of the latest knowledge, and assists in evidence-based medical practice. It can also easily integrate with local knowledge bases without additional training or fine-tuning. In summary, LINS is a multifunctional, highly professional, privacy-protecting, and up-to-date medical Q&A framework with broad application value in the medical field. It is expected to promote the application and development of large language models in medicine, thereby improving the efficiency of related professionals. 
+</div>
 
 ![paper](./assets/LINS.png)
 
@@ -41,7 +43,23 @@ export SERPAPI_KEY="YOUR KEY"
 
 ## Model Preparation
 
-The Qwen model can be found at [https://huggingface.co/Qwen/Qwen1.5-110B](https://huggingface.co/Qwen/Qwen1.5-110B), the recall model for the retriever at [https://huggingface.co/BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3),and the ranking model at [https://huggingface.co/BAAI/bge-reranker-v2-m3](https://huggingface.co/BAAI/bge-reranker-v2-m3). Finally, the T5 model is accessible at [https://huggingface.co/google-t5/t5-11b](https://huggingface.co/google-t5/t5-11b).
+The Qwen model can be found at [Qwen1.5-110B on Hugging Face](https://huggingface.co/Qwen/Qwen1.5-110B), the recall model for the retriever at [bge-m3 on Hugging Face](https://huggingface.co/BAAI/bge-m3), and the ranking model at [bge-reranker-v2-m3 on Hugging Face](https://huggingface.co/BAAI/bge-reranker-v2-m3). Finally, the T5 model (used for Link-Eval) is accessible at [t5-11b on Hugging Face](https://huggingface.co/google-t5/t5-11b).
+
+
+
+
+These models are placed in the following positions
+```bash
+├──model
+│   ├──retriever
+│   │   ├──bge
+│   │   │   ├──bge-m3
+│   │   │   ├──bge-reranker-v2-m3
+│   ├──generator
+│   │   ├──Qwen1.5-110B-Chat
+│   ├──NLI
+│   │   ├──T5-11B
+```
 
 ## Keyword Extraction
 
