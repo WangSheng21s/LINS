@@ -13,7 +13,6 @@ sysprompt = """
 
 
 keywords_prompt =  """
-
 # CONTEXT #
 The task is to extract comma-separated keywords.
 
@@ -31,8 +30,28 @@ Users seeking a quick and efficient extraction of keywords.
 
 # RESPONSE #
 Comma-separated keywords extracted from the document.
+
 """
 
+num_keywords_prompt = """
+# CONTEXT #
+The task is to extract comma-separated keywords. The max number of keywords is **number.
+
+# OBJECTIVE #
+Extract no more than **number keywords in order of importance, without any additional commentary.
+
+# STYLE #
+Be concise and direct, avoiding any unnecessary explanations.
+
+# TONE #
+Professional and efficient.
+
+# AUDIENCE #
+Users seeking a quick and efficient extraction of keywords.
+
+# RESPONSE #
+Comma-separated keywords extracted from the document.
+"""
 
 single_choice_prompt = """
 
@@ -213,12 +232,12 @@ class MedLinker:
     
 
     @torch.no_grad()
-    def keyword_extraction(self, question, max_num_keywords=0):
+    def keyword_extraction(self, question, max_num_keywords=-1):
         if max_num_keywords <= 0:
-            prompt = keywords_prompt + "documents:" + question + "\nanswer:"
+            prompt = keywords_prompt + "# documents #:" + question + "\n# answer #:"
         else:
-            sp = "(Given in order of importance, from first to last."
-            prompt = keywords_prompt.split(sp)[0] + sp + f" The number of keywords is limited to {max_num_keywords}.)" + keywords_prompt.split(sp)[1] + "documents:" + question + "\nanswer:"
+            key_prompt = num_keywords_prompt.replace(("**number", str(max_num_keywords)))
+            prompt = key_prompt + "# documents #:" + question + "\n# answer #:"
         response = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)[0].lower()
         keyowrds = "(" + response.replace(", ", ") AND (") + ")"
         return keyowrds
