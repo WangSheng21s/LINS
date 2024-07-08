@@ -1,32 +1,58 @@
-import faiss
+
 import json
-import argparse
 import numpy as np
-import time
 import os
-import pickle
 import torch
 from .searching import create_searcher
 from .fetching import Fetcher
 from .extracting import Extractor
 from .filtering import ReferenceFilter
-
-from .HLATR.retrieval.encoder_corpus import Encoder 
-from .HLATR.rerank.reranker.modeling import  RerankerForInference, Reranker
-
-#from .HLATR.hlatr.src import Reranker, Reranker_ws_1, Reranker_ws_2, Reranker_ws_3
-#from .HLATR.hlatr.src.arguments import ModelArguments, DataArguments, RerankerTrainingArguments as TrainingArguments
-#from FlagEmbedding import BGEM3FlagModel
-
 from typing import Optional, Union, List, Dict, Tuple, Iterable, Callable, Any
-from transformers import (
-    HfArgumentParser,
-    set_seed,
-)
-
 
 from Bio import Entrez, Medline
 import re
+import torch.nn as nn
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, PreTrainedModel, PreTrainedTokenizer
+from typing import Optional
+
+class RerankerForInference(nn.Module):
+    def __init__(
+            self,
+            hf_model: Optional[PreTrainedModel] = None,
+            tokenizer: Optional[PreTrainedTokenizer] = None
+    ):
+        super().__init__()
+        self.hf_model = hf_model
+        self.tokenizer = tokenizer
+
+    def tokenize(self, *args, **kwargs):
+        return self.tokenizer(*args, **kwargs)
+
+    def forward(self, batch):
+        return self.hf_model(**batch)
+
+    @classmethod
+    def from_pretrained(cls, pretrained_model_name_or_path: str):
+        hf_model = AutoModelForSequenceClassification.from_pretrained(
+            pretrained_model_name_or_path)
+        hf_tokenizer = AutoTokenizer.from_pretrained(
+            pretrained_model_name_or_path)
+
+        hf_model.eval()
+        return cls(hf_model, hf_tokenizer)
+
+    def load_pretrained_model(self, pretrained_model_name_or_path, *model_args, **kwargs):
+        self.hf_model = AutoModelForSequenceClassification.from_pretrained(
+            pretrained_model_name_or_path, *model_args, **kwargs
+        )
+
+    def load_pretrained_tokenizer(self, pretrained_model_name_or_path, *inputs, **kwargs):
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            pretrained_model_name_or_path, *inputs, **kwargs
+        )
+
+
+
 def pubmed_search(question:str, retmax=20) ->list:
 
     Entrez.email = "869347360@qq.com"
@@ -113,10 +139,7 @@ class ReferenceRetiever():
         self.reranker_model_path = reranker_model_path
 
         self.filter = None
-        self.merge_model = None
-        self.retrieval_encoder = None
         self.rerank_model = None
-        self.omim_ref_embeddings = None
         self.local_ref_embeddings = None
         #self.filter_with_different_urls = filter_with_different_urls
         
@@ -310,7 +333,6 @@ class ReferenceRetiever():
         if self.filter is None:
             self.get_filter()
         question_embedding = self.filter.scorer.get_query_embeddings([question])[0]
-        #计算question与omim_ref_embeddings中的各个向量的点积
         scores = question_embedding @ self.local_ref_embeddings.t()
         #取最大的前5个
         scores, indices = scores.topk(min(topk, len(scores)))
