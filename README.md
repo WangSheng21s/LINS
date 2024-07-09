@@ -85,6 +85,7 @@ keywords = medlinker.keyword_extraction(sentence, max_num_keywords)
 
 ## Retrieve Evidence
 
+![KED](./assets/KED.png)
 Content for retrieve evidence...
 
 ## Direct Multi-Round Q&A
