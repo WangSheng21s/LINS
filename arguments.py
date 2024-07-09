@@ -25,6 +25,6 @@ def get_medlinker_args(args_list=None, parser=None):
         assert isinstance(parser, argparse.ArgumentParser)
     
     parser = add_model_medlinker_config_args(parser)
-    parser = add_evaluation_args(parser)
+    #parser = add_evaluation_args(parser)
     
     return parser.parse_args()
