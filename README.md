@@ -126,6 +126,14 @@ evidence = medlinker.keyword_search(sentence, if_short_sentences=False)
 ## Direct Multi-Round Q&A
 
 ```bash
+from arguments import get_medlinker_args
+from model.modeling_medlinker import load_model
+
+args = get_medlinker_args()
+args.medlinker_ckpt_path = "./model/generator/Qwen1.5-110B-Chat"
+
+medlinker = load_model(args)
+
 response, history = medlinker.chat(prompt="hello", history=None)
 
 """response
@@ -142,11 +150,49 @@ Models that use demographic shortcuts, or proxies for sensitive attributes like 
 
 ## Original Retrieval-Augmented Generation
 
-Content for original retrieval-augmented generation...
+```bash
+from arguments import get_medlinker_args
+from model.modeling_medlinker import load_model
+
+args = get_medlinker_args()
+args.medlinker_ckpt_path = "./model/generator/Qwen1.5-110B-Chat"
+
+medlinker = load_model(args)
+
+question = "What are the effects of combining antibiotics and immunotherapy?"
+results = medlinker.Original_RAG(question)
+
+"""results
+answer: Combining antibiotics and immunotherapy has not been specifically detailed in the provided knowledge regarding gastric MALT lymphoma. However, H. pylori eradication, typically achieved with antibiotics, is the first-line treatment leading to high remission rates, while immunotherapy like rituximab is reserved for non-responding cases. The synergistic effects or specific combinations in the context of MALT lymphoma treatment are not mentioned. In general, antibiotic therapy targets the bacterial infection, whereas immunotherapy aims to enhance or restore the patient's immune response to cancer cells. Further research would be necessary to discuss the combined effects in detail.[1]
+
+refs: [1] https://pubmed.ncbi.nlm.nih.gov/24363507
+"""
+```
 
 ## Multi-Agent Iterative Retrieval-Augmented Generation
 
-Content for multi-agent iterative retrieval-augmented generation...
+```bash
+from arguments import get_medlinker_args
+from model.modeling_medlinker import load_model
+
+args = get_medlinker_args()
+args.medlinker_ckpt_path = "./model/generator/Qwen1.5-110B-Chat"
+
+medlinker = load_model(args)
+
+question = "What are the effects of combining antibiotics and immunotherapy?"
+results = medlinker.MAIRAG(question)
+
+"""results
+answer: Combining antibiotics with immunotherapy has demonstrated enhanced treatment efficacy against bacterial infections, particularly in combating drug-resistant pathogens. For instance, the coadministration of Clofazimine (CFZ) and Rapamycin (RAPA) effectively eliminates both multiple and extensively drug-resistant (MDR and XDR) strains of Mycobacterium tuberculosis in a mouse model by boosting T-cell memory and polyfunctional TCM responses, while also reducing latency-associated gene expression in human macrophages [2]. This approach not only improves bacterial clearance but also holds promise for addressing the issue of drug resistance and disease recurrence in tuberculosis. Similarly, N-formylated peptides have shown adjunctive therapeutic effects when combined with anti-tuberculosis drugs (ATDs), conferring additional therapeutic benefits in mouse models of TB by enhancing neutrophil function and reducing bacterial load [3]. These findings highlight the potential of combining antimicrobial and immunomodulatory agents to achieve improved outcomes in bacterial infection treatment.
+
+refs: [1] https://pubmed.ncbi.nlm.nih.gov/37481650
+      [2] https://pubmed.ncbi.nlm.nih.gov/37290049
+      [3] https://pubmed.ncbi.nlm.nih.gov/31046503
+      [4] https://pubmed.ncbi.nlm.nih.gov/33552074
+      [5] https://pubmed.ncbi.nlm.nih.gov/11244046
+"""
+```
 
 ## Integrate Local Knowledge Base for Answering
 
