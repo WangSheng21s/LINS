@@ -281,6 +281,29 @@ class ReferenceRetiever():
 
         search_results=(index, retrieval_scores,texts, urls, titles, rerank_scores, rerank_embeds)
         return search_results #index retrieval_scores    
+
+    @torch.no_grad()
+    def medlinker_merage(self, query=None, search_results=None, topk=5, filter_with_different_urls=True, local_data_name="", if_pubmed=True):
+        
+        if search_results == None:
+            search_results = self.medlinker_rerank(query=query, filter_with_different_urls=filter_with_different_urls, local_data_name=local_data_name, if_pubmed=if_pubmed)
+        if search_results == None:
+            return None
+        index, retrieval_scores, texts, urls, titles, rerank_scores, rerank_embeds = search_results
+        result = {'index':[], 'scores':[], 'texts':[], 'urls':[], 'titles':[]}
+        #按照rerank_scores排序
+        rerank_scores = np.array(rerank_scores)
+        indices = np.argsort(rerank_scores.ravel())[::-1]  #上面的index是检索到的索引，这里的index是排序后的索引
+        for i in range(topk):
+            if i >= len(index):
+                break
+            id = indices[i]
+            result['index'].append(index[id])
+            result['scores'].append(retrieval_scores[id])
+            result['texts'].append(texts[id])
+            result['urls'].append(urls[id])
+            result['titles'].append(titles[id])
+        return result
     
     
     @torch.no_grad()
