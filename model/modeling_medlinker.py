@@ -236,7 +236,7 @@ class MedLinker:
         if max_num_keywords <= 0:
             prompt = keywords_prompt + "# documents #:" + question + "\n# answer #:"
         else:
-            key_prompt = num_keywords_prompt.replace(("**number", str(max_num_keywords)))
+            key_prompt = num_keywords_prompt.replace("**number", str(max_num_keywords))
             prompt = key_prompt + "# documents #:" + question + "\n# answer #:"
         response = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)[0].lower()
         keyowrds = "(" + response.replace(", ", ") AND (") + ")"
