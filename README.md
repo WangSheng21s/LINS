@@ -24,7 +24,15 @@ LINS comes with different functionalities.
 Clone this repo, and install python requirements.
 
 ```bash
+conda create --name LINS python=3.11.6
+conda activate LINS
 pip install -r requirements.txt
+conda install -c pytorch faiss-gpu
+```
+
+Install torch
+```bash
+pip install torch==2.1.0+cu118 torchvision torchaudio -f https://download.pytorch.org/whl/cu118/torch_stable.html
 ```
 
 Install Nodejs.
