@@ -89,6 +89,7 @@ sentence = "As artificial intelligence (AI) rapidly approaches human-level perfo
 max_num_keywords = -1  #There is no limit on the maximum number of keywords when max_num_keywords <= 0.
 
 keywords = medlinker.keyword_extraction(sentence, max_num_keywords)
+#(ai) AND (medical imaging) AND (fairness) AND (demographic shortcuts) AND (disease classification)
 ```
 
 ## Retrieve Evidence
