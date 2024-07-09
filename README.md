@@ -77,7 +77,7 @@ These models are placed in the following positions：
 
 ```bash
 from arguments import get_medlinker_args
-from model.modeling_medlinker_110B import load_model
+from model.modeling_medlinker import load_model
 
 args = get_medlinker_args()
 args.medlinker_ckpt_path = "./model/generator/Qwen1.5-110B-Chat"
