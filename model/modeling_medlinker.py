@@ -135,7 +135,8 @@ class MedLinker:
             tokenizer = self.tokenizer
         messages = [{"role": "system", "content": "You are a helpful assistant."}]
         if history is not None:
-            messages.extend([{"role": "user", "content": msg} for msg in history])
+            messages.extend(history)
+            #messages.extend([{"role": "user", "content": msg} for msg in history])
         messages.append({"role": "user", "content": prompt})
 
         text = tokenizer.apply_chat_template(
