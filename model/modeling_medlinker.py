@@ -7,10 +7,6 @@ import re, os, torch, json
 from Bio import Entrez, Medline
 Entrez.email = "869347360@qq.com"
 
-sysprompt = """
-
-"""
-
 
 keywords_prompt =  """
 # CONTEXT #
@@ -55,7 +51,26 @@ Comma-separated keywords extracted from the document.
 
 
 
-retrieval_prompt = """
+RAG_prompt = """
+# CONTEXT #
+Refer to the following KNOWLEDGE along with your own understanding to answer the questions presented.
+
+# OBJECTIVE #
+Consider the given KNOWLEDGE carefully and provide an accurate response.
+
+# STYLE #
+Avoid phrases such as "the retrieved paragraph mentions" or "according to the provided KNOWLEDGE" in your response. Ensure the content is fully and clearly expressed for easy reading.
+
+# TONE #
+The response should be as detailed, professional, and objective as possible.
+
+# AUDIENCE #
+All users
+
+# RESPONSE #
+Incorporate as much content from the KNOWLEDGE as possible in your response, especially data or examples. For each sentence in the response,if the sentence includes content or data from the KNOWLEDGE, or examples, use a citation format "[n]" at the end of the sentence, where n indicates the example number. A sentence can have multiple citations such as "[1][2][3]", but the citations should always appear at the end of the sentence bef
+
+#KNOWLEDGE#
 
 """
 
@@ -231,7 +246,7 @@ class MedLinker:
             for ix, ref in enumerate(refs["texts"]):
                 references_str += "[" + str(ix+1) + "] " + ref + " \n"
 
-        prompt = "Please answer the following medical question to the best of your ability. There are several references provided:\n" + references_str + "\nPlease refer to the above references and provide an effective, reasonable, comprehensive, and logical answer. The content should be as complete as possible, frequently citing data or examples from the references as evidence for the discussion. The answer should lean towards professionalism, and the corresponding reference numbers should be given in the format of [1][2] within the answer.\n" + f"Question: {question}"
+        prompt = RAG_prompt + references_str + "\n#QUESTION#" + f"{question}"
         response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
         return { "answer": response, "references": refs}
 
