@@ -53,35 +53,6 @@ Users seeking a quick and efficient extraction of keywords.
 Comma-separated keywords extracted from the document.
 """
 
-single_choice_prompt = """
-
-"""
-
-MedQAprompt = """
-
-"""
-
-pubmedqa_prompt = """
-
-"""
-pubmedqa_prompt = """
-
-"""
-
-
-pubmed_little_shots="""
-
-"""
-
-MedQA_little_shots="""
-
-"""
-
-
-pubmedshots="""
-
-"""
-
 
 
 retrieval_prompt = """
@@ -92,17 +63,11 @@ Passage_Relevance_prompt = """
 
 """
 
-MedQA_Passage_Relevance_prompt = """
-
-"""
 
 Question_Decomposition_prompt = """
 
 """
 
-oncokb_Passage_Coherence_prompt = """
-
-"""
 
 Passage_Coherence_prompt = """
 You are an expert in determining whether there is consistency between the generated sentence and the retrieved paragraph. If there is a content conflict between the generated sentence and the retrieved paragraph, you would answer 'conflict', if the content of the two is consistent, you would answer 'coherence', and if the content of the two is not related, you would answer 'irrelevant'. Be careful to get to the point when answering, don't have any explanations or chitchat, just answer "conflict" or "coherence" or "irrelevant".
@@ -112,6 +77,7 @@ You are an expert in determining whether there is consistency between the genera
 Self_knowledge_prompt = """
 
 """
+
 
 class MedLinker:
     def __init__(self, medlinker_ckpt_path, retriever_ckpt_path, device="cuda:0", filter_max_batch_size=400, searcher_name="bing", filter_with_different_urls=True) -> None:
@@ -285,35 +251,11 @@ class MedLinker:
                 continue
         return literature_info
 
-
     @torch.no_grad()
-    def keywords_query_option(self, question, refs = "", filter_with_different_urls=False, with_omim=False, topk=5, if_pubmed = True, if_merge=False, if_short_sentences = True):
-        retriever_query = question.split("options")[0]
-        references_str = ''
-        if refs == "":
-            search_results = self.keyword_search(retriever_query, topk=5, if_short_sentences=if_short_sentences)
-            if search_results == None or search_results == []:
-                return { "references": [], "answer": "" }
-            recall_search_results = self.ref_retriever.medlinker_query(question=retriever_query, data_list=search_results, filter_with_different_urls=False)
-            rerank_search_results = self.ref_retriever.medlinker_rerank(query=retriever_query, search_results=recall_search_results)
-            merge_search_results = self.ref_retriever.medlinker_merage(query=retriever_query, search_results=rerank_search_results, if_merge=if_merge, topk=topk, if_pubmed=if_pubmed, local_data_name="", filter_with_different_urls=False)
-            refs = merge_search_results
-
-
-            if not refs:
-                return { "references": [], "answer": "" }
-            
-            for ix, ref in enumerate(refs["texts"]):
-                txt = ref
-                references_str += "[" + str(ix+1) + "] " + txt + " \n"
-        else:
-            for ix, ref in enumerate(refs["texts"]):
-                references_str += "[" + str(ix+1) + "] " + ref + " \n"
-        
-        prompt = single_choice_prompt + question + retrieval_prompt + references_str
-        response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
-        return { "answer": response, "references": refs}
-    
+    def Original_RAG(self, question, filter_with_different_urls=False, topk=5, if_pubmed=True, if_short_sentences=False, local_data_name="")
+        search_results = self.keyword_search(retriever_query, topk=5, if_short_sentences=if_short_sentences)
+        if search_results == None:
+            return { "references": [], "answer": "" }
     @torch.no_grad()
     def keywords_query_chat(self, question, refs = "", filter_with_different_urls=False, with_omim=False, topk=5, if_pubmed = True, if_merge=False, if_short_sentences = True):
         references_str = ''
@@ -340,180 +282,26 @@ class MedLinker:
         response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
         return { "answer": response, "references": refs}
 
-    @torch.no_grad()
-    def agent_iterative_query_opt(self, question, local_data_name="", topk=5, if_pubmed=False, if_merge=False, itera_num=1, if_short_sentences=True):
-        if itera_num >3:
-            return "None"
-        retrieved_passages = []
-        retriever_query = question.split("options")[0]
-        if if_pubmed:
-            search_results = self.keyword_search(retriever_query, topk=5, if_short_sentences=if_short_sentences)
-            if search_results != None and search_results != []:
-                
-                recall_search_results = self.ref_retriever.medlinker_query(question=retriever_query, data_list=search_results, filter_with_different_urls=False)
-                rerank_search_results = self.ref_retriever.medlinker_rerank(query=retriever_query, search_results=recall_search_results)
-                merge_search_results = self.ref_retriever.medlinker_merage(query=retriever_query, search_results=rerank_search_results, if_merge=if_merge, topk=topk, if_pubmed=if_pubmed, local_data_name="", filter_with_different_urls=False)
-                refs = merge_search_results
 
-            
-                for ix, ref in enumerate(refs["texts"]):
-                    txt = ref
-                    retrieved_passages.append(txt)
-        else:
-            refs = self.ref_retriever.medlinker_merage(query=retriever_query, filter_with_different_urls=False, topk=topk, if_pubmed=False, if_merge=False, local_data_name=local_data_name)
-            if refs != None and refs != []:
-                for ix, ref in enumerate(refs["texts"]):
-                    txt = ref
-                    retrieved_passages.append(txt)
-        
-        if retrieved_passages != []:
-            PRM_result = self.PRM(question, retrieved_passages)#list[str]
-            if 'gold' in PRM_result:
-                #返回gold对应的索引
-                gold_index = []
-                for i in range(len(PRM_result)):
-                    if PRM_result[i] == "gold":
-                        gold_index.append(i)
-                references_str = ''
-                for ix in gold_index:
-                    txt = retrieved_passages[ix]
-                    references_str += "[" + str(ix+1) + "] " + txt + " \n"
-                if itera_num == 1:
-                    prompt = single_choice_prompt + question + retrieval_prompt + references_str
-                else:
-                    prompt = question + retrieval_prompt + references_str
-                response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
-
-                #response = response.split(',')[0]
-                if itera_num == 1:
-                    #检查一致性
-                    sentence = question + "          answer:" + response
-                    coher = self.PCM(sentence, references_str)
-                    if coher=='conflict':
-                        re_prompt = ""
-                        re_prompt += "The generated sentence is inconsistent with the retrieved paragraph. Please re-answer the question based on the retrieved paragraph but your own knowledge."
-                        #print("The generated sentence is inconsistent with the retrieved paragraph. ")
-                        #print("sentence:", sentence)
-                        #print("passage:", references_str)
-                        response, history = self.chat(tokenizer=self.tokenizer, prompt=re_prompt, history=history)
-                return response
-        print("检索的知识对回答问题没有帮助，下一步判断模型是否能够依靠自身知识回答问题")
-        SKM_result = self.SKM(question)
-        if 'CERTAIN' in SKM_result:
-            print("模型自身知识可以回答问题")
-            print("question:", question)
-            if itera_num == 1:
-                prompt = question
-            else:
-                prompt = single_choice_prompt + question
-            response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
-            refs = ""
-            return response
-        else:
-            print("模型自身知识不能回答问题，需要进一步迭代")
-            if itera_num ==2:
-                print("迭代次数已经达到2次，不再迭代")
-                return "None"
-            sub_questions = self.QDM(question)
-            sub_questions_answers = []
-            for sub_question in sub_questions:
-                sub_question_answer = self.agent_iterative_query_opt(sub_question, local_data_name=local_data_name, topk=topk, if_pubmed=if_pubmed, if_merge=if_merge, itera_num=itera_num+1, if_short_sentences=if_short_sentences)
-                sub_questions_answers.append(sub_question_answer)
-            references_str = single_choice_prompt + 'The first are some sub-questions, please refer to answering the last question.\n'
-            for ix, ref in enumerate(sub_questions_answers):
-                if ref != "None":
-                    references_str += 'sub question: ' + sub_questions[ix] + "\n" + 'sub question answer: ' + ref + "\n"
-            references_str += 'The last question is: ' + question + "\n"
-            print(references_str)
-            response, history = self.chat(tokenizer=self.tokenizer, prompt=references_str, history=None)
-            refs = ""
-            return response
-        
-    
-    @torch.no_grad()
-    def agent_iterative_query_opt_woQDM(self, question, local_data_name="", topk=5, if_pubmed=False, if_merge=False, itera_num=1, if_short_sentences=True):
-        if itera_num >3:
-            return "None"
-        retrieved_passages = []
-        retriever_query = question.split("options")[0]
-        if if_pubmed:
-            search_results = self.keyword_search(retriever_query, topk=5, if_short_sentences=if_short_sentences)
-            if search_results != None and search_results != []:
-                
-                recall_search_results = self.ref_retriever.medlinker_query(question=retriever_query, data_list=search_results, filter_with_different_urls=False)
-                rerank_search_results = self.ref_retriever.medlinker_rerank(query=retriever_query, search_results=recall_search_results)
-                merge_search_results = self.ref_retriever.medlinker_merage(query=retriever_query, search_results=rerank_search_results, if_merge=if_merge, topk=topk, if_pubmed=if_pubmed, local_data_name="", filter_with_different_urls=False)
-                refs = merge_search_results
-
-            
-                for ix, ref in enumerate(refs["texts"]):
-                    txt = ref
-                    retrieved_passages.append(txt)
-        else:
-            refs = self.ref_retriever.medlinker_merage(query=retriever_query, filter_with_different_urls=False, topk=topk, if_pubmed=False, if_merge=False, local_data_name=local_data_name)
-            if refs != None and refs != []:
-                for ix, ref in enumerate(refs["texts"]):
-                    txt = ref
-                    retrieved_passages.append(txt)
-        
-        if retrieved_passages != []:
-            PRM_result = self.PRM(question, retrieved_passages)#list[str]
-            if 'gold' in PRM_result:
-                #返回gold对应的索引
-                gold_index = []
-                for i in range(len(PRM_result)):
-                    if PRM_result[i] == "gold":
-                        gold_index.append(i)
-                references_str = ''
-                for ix in gold_index:
-                    txt = retrieved_passages[ix]
-                    references_str += "[" + str(ix+1) + "] " + txt + " \n"
-
-                print("question:", question)
-                print("passage:", references_str)
-                prompt = single_choice_prompt + question + retrieval_prompt + references_str
-                response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
-                #response = response.split(',')[0]
-                #检查一致性
-                sentence = question + "          answer:" + response
-                coher = self.PCM(sentence, references_str)
-                if coher=='conflict':
-                    re_prompt = ""
-                    re_prompt += "The generated sentence is inconsistent with the retrieved paragraph. Please re-answer the question based on the retrieved paragraph but your own knowledge."
-                    #print("The generated sentence is inconsistent with the retrieved paragraph. ")
-                    #print("sentence:", sentence)
-                    #print("passage:", references_str)
-                    response, history = self.chat(tokenizer=self.tokenizer, prompt=re_prompt, history=history)
-                return response
-        response, history = self.chat(tokenizer=self.tokenizer, prompt=single_choice_prompt+question, history=None)
-        refs = ""
-        return response
         
             
 
     @torch.no_grad()
-    def query_chat(self, question, refs ="", filter_with_different_urls=True, topk=5, if_pubmed=True, if_merge=False, if_short_sentences=False, local_data_name=""):
+    def Original_RAG(self, question, filter_with_different_urls=False, topk=5, if_pubmed=True, if_merge=False, if_short_sentences=False, local_data_name=""):
         references_str = ''
-        if refs == "":
-
-            if if_pubmed:
-                search_results = self.keyword_search(question, topk=5, if_short_sentences=if_short_sentences)
-                if search_results != None and search_results != []:
-
-                    recall_search_results = self.ref_retriever.medlinker_query(question=question, data_list=search_results, filter_with_different_urls=False)
-                    rerank_search_results = self.ref_retriever.medlinker_rerank(query=question, search_results=recall_search_results)
-                    merge_search_results = self.ref_retriever.medlinker_merage(query=question, search_results=rerank_search_results, if_merge=if_merge, topk=topk, if_pubmed=if_pubmed, local_data_name="", filter_with_different_urls=False)
-                    refs = merge_search_results
-
-
-            else:
-                refs = self.ref_retriever.medlinker_merage(query=question, filter_with_different_urls=False, topk=topk, if_pubmed=False, if_merge=False, local_data_name=local_data_name)
-        
+        if if_pubmed:
+            search_results = self.keyword_search(question, topk=5, if_short_sentences=if_short_sentences)
+            if search_results != None and search_results != []:
+                recall_search_results = self.ref_retriever.medlinker_query(question=question, data_list=search_results, filter_with_different_urls=filter_with_different_urls)
+                rerank_search_results = self.ref_retriever.medlinker_rerank(query=question, search_results=recall_search_results)
+                merge_search_results = self.ref_retriever.medlinker_merage(query=question, search_results=rerank_search_results, if_merge=if_merge, topk=topk, if_pubmed=if_pubmed, local_data_name="", filter_with_different_urls=filter_with_different_urls)
+                refs = merge_search_results
+        else:
+            refs = self.ref_retriever.medlinker_merage(query=question, filter_with_different_urls=False, topk=topk, if_pubmed=False, if_merge=False, local_data_name=local_data_name)
         if refs != None and refs != []:
             for ix, ref in enumerate(refs["texts"]):
                 references_str += "[" + str(ix+1) + "] " + ref + " \n"
-        #prompt = "Answer the following question about medical as best you can. There have some references:\n" + references_str + "\n Please refer to the above references and give a valid, reasonable, complete and logical answer, with the requirement to give the appropriate citations.\n" + f"Question: {question}"
-        #prompt = "MedLinker:" + "question:" + question + "\nretrieval_texts:" + references_str
+
         prompt = "Please answer the following medical question to the best of your ability. There are several references provided:\n" + references_str + "\nPlease refer to the above references and provide an effective, reasonable, comprehensive, and logical answer. The content should be as complete as possible, frequently citing data or examples from the references as evidence for the discussion. The answer should lean towards professionalism, and the corresponding reference numbers should be given in the format of [1][2] within the answer.\n" + f"Question: {question}"
         response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
         return { "answer": response, "references": refs}
