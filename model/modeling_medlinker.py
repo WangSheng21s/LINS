@@ -231,7 +231,7 @@ class MedLinker:
         
 
     @torch.no_grad()
-    def Original_RAG(self, question, filter_with_different_urls=False, topk=5, if_pubmed=True, if_merge=False, if_short_sentences=False, local_data_name=""):
+    def Original_RAG(self, question, filter_with_different_urls=False, topk=5, if_pubmed=True, if_short_sentences=False, local_data_name=""):
         references_str = ''
         if if_pubmed:
             search_results = self.keyword_search(question, topk=5, if_short_sentences=if_short_sentences)
