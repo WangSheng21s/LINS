@@ -250,6 +250,81 @@ class MedLinker:
         response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
         return { "answer": response, "references": refs}
 
+
+
+    @torch.no_grad()
+    def MAIRAG(self, question, filter_with_different_urls=False, topk=5, if_pubmed=True, if_short_sentences=False, local_data_name="", itera_num=1):
+        if itera_num > 3:
+            return "None"
+        urls = []
+    
+        retrieved_passages = []
+        retriever_query = question
+    
+        if if_pubmed:
+            search_results = self.keyword_search(retriever_query, topk=5, if_short_sentences=if_short_sentences)
+            if search_results:
+                recall_search_results = self.ref_retriever.medlinker_query(
+                    question=retriever_query, data_list=search_results, filter_with_different_urls=False)
+                rerank_search_results = self.ref_retriever.medlinker_rerank(
+                    query=retriever_query, search_results=recall_search_results)
+                refs = self.ref_retriever.medlinker_merge(
+                    query=retriever_query, search_results=rerank_search_results, topk=topk, if_pubmed=if_pubmed, local_data_name="", filter_with_different_urls=False)
+        else:
+            refs = self.ref_retriever.medlinker_merge(
+                query=retriever_query, filter_with_different_urls=False, topk=topk, if_pubmed=False, local_data_name=local_data_name)
+        if refs:
+            for ref in refs:
+                retrieved_passages.append(ref['texts'])
+                urls.append(ref['urls'])
+    
+        if retrieved_passages:
+            PRM_result = self.PRM(question, retrieved_passages)
+            if 'gold' in PRM_result:
+                gold_index = [i for i, result in enumerate(PRM_result) if result == "gold"]
+                references_str = ''.join(f"[{ix+1}] {retrieved_passages[ix]} \n" for ix in gold_index)
+                prompt = RAG_prompt + references_str + "\n#QUESTION#" + f"{question}"
+                response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
+            
+                if itera_num == 1:
+                    sentence = question + " answer:" + response
+                    coher = self.PCM(sentence, references_str)
+                    if coher == 'conflict':
+                        re_prompt = "The generated sentence is inconsistent with the retrieved paragraph. Please re-answer the question based on the retrieved paragraph but your own knowledge."
+                        response, history = self.chat(tokenizer=self.tokenizer, prompt=re_prompt, history=history)
+                return response, urls, retrieved_passages
+
+        print("Retrieved knowledge did not help answer the question. Checking if the model can answer the question using its own knowledge.")
+        SKM_result = self.SKM(question)
+        if 'CERTAIN' in SKM_result:
+            print("Model can answer the question using its own knowledge.")
+            print("question:", question)
+            prompt = question
+            response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
+            return response, [], []
+        else:
+            print("Model cannot answer the question using its own knowledge, further iteration needed.")
+            if itera_num == 2:
+                print("Iteration limit reached. No further iterations.")
+                return "None"
+        
+            sub_questions = self.QDM(question)
+            sub_questions_answers = []
+            for sub_question in sub_questions:
+                sub_question_answer, sub_urls, sub_texts = self.agent_iterative_query_opt(sub_question, local_data_name=local_data_name, topk=topk, if_pubmed=if_pubmed, itera_num=itera_num+1, if_short_sentences=if_short_sentences)
+                sub_questions_answers.append(sub_question_answer)
+                urls.extend(sub_urls)
+                retrieved_passages.extend(sub_texts)
+            references_str = single_choice_prompt + 'The first are some sub-questions, please refer to answering the last question.\n'
+            for ix, ref in enumerate(sub_questions_answers):
+                if ref != "None":
+                    references_str += 'sub question: ' + sub_questions[ix] + "\n" + 'sub question answer: ' + ref + "\n"
+            references_str += 'The last question is: ' + question + "\n"
+            response, history = self.chat(tokenizer=self.tokenizer, prompt=references_str, history=None)
+            refs = ""
+            return response, urls, retrieved_passages
+
+
     
 
 def load_model(args):
