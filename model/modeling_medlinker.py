@@ -98,7 +98,7 @@ Output "Gold" or "Relevant" based on whether the knowledge contains the answer t
 
 Question_Decomposition_prompt = """
 # CONTEXT #
-You need to break down a poorly answered question into more manageable sub-questions.
+You need to break down a poorly answered question into no more than three manageable sub-questions.
 
 # OBJECTIVE #
 List sub-questions that are easier to answer and retrieve information for.
@@ -113,7 +113,7 @@ Analytical
 Users seeking assistance in breaking down complex questions into manageable parts.
 
 # RESPONSE #
-Decomposed sub-questions in a clear and organized list form.
+Decomposed sub-questions in a clear and organized list form. List each sub-question directly in the list without any other redundant dialogs.
 
 """
 
@@ -334,15 +334,16 @@ class MedLinker:
                     question=retriever_query, data_list=search_results, filter_with_different_urls=False)
                 rerank_search_results = self.ref_retriever.medlinker_rerank(
                     query=retriever_query, search_results=recall_search_results)
-                refs = self.ref_retriever.medlinker_merge(
+                refs = self.ref_retriever.medlinker_merage(
                     query=retriever_query, search_results=rerank_search_results, topk=topk, if_pubmed=if_pubmed, local_data_name="", filter_with_different_urls=False)
         else:
-            refs = self.ref_retriever.medlinker_merge(
+            refs = self.ref_retriever.medlinker_merage(
                 query=retriever_query, filter_with_different_urls=False, topk=topk, if_pubmed=False, local_data_name=local_data_name)
         if refs:
-            for ref in refs:
-                retrieved_passages.append(ref['texts'])
-                urls.append(ref['urls'])
+            for ref in refs['texts']:
+                retrieved_passages.append(ref)
+            for ref in refs['urls']:
+                urls.append(ref)
     
         if retrieved_passages:
             PRM_result = self.PRM(question, retrieved_passages)
@@ -377,11 +378,11 @@ class MedLinker:
             sub_questions = self.QDM(question)
             sub_questions_answers = []
             for sub_question in sub_questions:
-                sub_question_answer, sub_urls, sub_texts = self.agent_iterative_query_opt(sub_question, local_data_name=local_data_name, topk=topk, if_pubmed=if_pubmed, itera_num=itera_num+1, if_short_sentences=if_short_sentences)
+                sub_question_answer, sub_urls, sub_texts = self.MAIRAG(sub_question, local_data_name=local_data_name, topk=topk, if_pubmed=if_pubmed, itera_num=itera_num+1, if_short_sentences=if_short_sentences)
                 sub_questions_answers.append(sub_question_answer)
                 urls.extend(sub_urls)
                 retrieved_passages.extend(sub_texts)
-            references_str = single_choice_prompt + 'The first are some sub-questions, please refer to answering the last question.\n'
+            references_str = 'The first are some sub-questions, please refer to answering the last question.\n'
             for ix, ref in enumerate(sub_questions_answers):
                 if ref != "None":
                     references_str += 'sub question: ' + sub_questions[ix] + "\n" + 'sub question answer: ' + ref + "\n"
