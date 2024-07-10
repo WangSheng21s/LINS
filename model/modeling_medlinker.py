@@ -211,11 +211,9 @@ class MedLinker:
     @torch.no_grad()
     def PRM(self, question:str, refs:list[str], task='MedQA'):#passage relevance module
         prompt = Passage_Relevance_prompt
-        if task == 'MedQA':
-            prompt = MedQA_Passage_Relevance_prompt
         result = []
         for  ref in refs:
-            PRM_prompt = prompt + question + "\npassage:" + ref + "\nanswer:"
+            PRM_prompt = prompt + "#QUESTION#\n" + question + "\n#PASSAGE#\n" + ref + "\n#ANSWER#\n"
             response, history = self.chat(tokenizer=self.tokenizer, prompt=PRM_prompt, history=None)
             result.append(response)
         return result
@@ -223,13 +221,13 @@ class MedLinker:
 
     @torch.no_grad()
     def SKM(self, question:str):#self knowledge module
-        prompt = Self_knowledge_prompt + question
+        prompt = Self_knowledge_prompt + "#QUESTION#\n" + question+ "\n#ANSWER#\n"
         response, history = self.chat(tokenizer=self.tokenizer, prompt = prompt, history=None)
         return [response]
     
     @torch.no_grad()
     def QDM(self, question:str):#question decomposition module
-        prompt = Question_Decomposition_prompt + question + "\nanswer:"
+        prompt = Question_Decomposition_prompt + "#QUESTION#\n" + question + "\n#ANSWER#\n"
         response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
         question_list = []
         for i in response.split("\n"):
@@ -238,7 +236,7 @@ class MedLinker:
         return question_list
 
     def PCM(self, sentence:str, passage:str):
-        prompt = Passage_Coherence_prompt + "sentence: " + sentence + "\npassage: " + passage + "\nanswer:"
+        prompt = Passage_Coherence_prompt + "#SENTENCE#\n" + sentence + "\n#PARAGRAPH#\n" + passage + "\n#PARAGRAPH#\n" + "\n#ANSWER#\n"
         response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
         return response
     
