@@ -196,5 +196,5 @@ refs: [1] https://pubmed.ncbi.nlm.nih.gov/37481650
 
 ## Integrate Local Knowledge Base for Answering
 
-Content for integrate local knowledge base for answering...
+![LRAG](./assets/LocalRAG.png)
 
