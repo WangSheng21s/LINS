@@ -75,20 +75,88 @@ Incorporate as much content from the KNOWLEDGE as possible in your response, esp
 """
 
 Passage_Relevance_prompt = """
+# CONTEXT #
+You need to determine if a paragraph of medical knowledge contains the answer to a given question.
+
+# OBJECTIVE #
+If the paragraph contains the answer to the question, output "Gold"; if it does not contain the answer, or although the paragraph is related to the question but cannot help to answer it, output "Relevant.
+
+# STYLE #
+Provide a direct and concise response without any further explanation or chat.
+
+# TONE #
+Neutral
+
+# AUDIENCE #
+Users seeking quick and clear verification of medical information.
+
+# RESPONSE #
+Output "Gold" or "Relevant" based on whether the knowledge contains the answer to the question.
 
 """
 
 
 Question_Decomposition_prompt = """
+# CONTEXT #
+You need to break down a poorly answered question into more manageable sub-questions.
+
+# OBJECTIVE #
+List sub-questions that are easier to answer and retrieve information for.
+
+# STYLE #
+Concise and focused on breaking down the main question.
+
+# TONE #
+Analytical
+
+# AUDIENCE #
+Users seeking assistance in breaking down complex questions into manageable parts.
+
+# RESPONSE #
+Decomposed sub-questions in a clear and organized list form.
 
 """
 
 
 Passage_Coherence_prompt = """
+# CONTEXT #
+You need to determine whether the generated sentence is consistent with the meaning expressed in the retrieved paragraph.
+
+# OBJECTIVE #
+Provide a straightforward assessment of the coherence between the sentence and the paragraph.
+
+# STYLE #
+Direct and focused response without any additional explanations.
+
+# TONE #
+Neutral
+
+# AUDIENCE #
+Users seeking quick evaluation of content consistency.
+
+# RESPONSE #
+Either "Conflict", "Coherence", or "Irrelevant" based on the relationship between the generated sentence and the retrieved paragraph.
 
 """
 
 Self_knowledge_prompt = """
+# CONTEXT #
+You need to assess whether you can answer questions correctly.
+
+# OBJECTIVE #
+Provide an honest assessment of your ability to answer each question correctly.
+
+# STYLE #
+Be objective and truthful in your evaluation.
+
+# TONE #
+Neutral
+
+# AUDIENCE #
+Users seeking accurate self-assessment of your ability to answer questions.
+
+# RESPONSE #
+Either "CERTAIN" or "UNCERTAIN" based on your genuine assessment of your ability to answer each question correctly without any chat-based fluff and say nothing else. 
 
 """
 
@@ -280,16 +348,16 @@ class MedLinker:
     
         if retrieved_passages:
             PRM_result = self.PRM(question, retrieved_passages)
-            if 'gold' in PRM_result:
-                gold_index = [i for i, result in enumerate(PRM_result) if result == "gold"]
-                references_str = ''.join(f"[{ix+1}] {retrieved_passages[ix]} \n" for ix in gold_index)
+            if 'Gold' in PRM_result:
+                Gold_index = [i for i, result in enumerate(PRM_result) if result == "Gold"]
+                references_str = ''.join(f"[{ix+1}] {retrieved_passages[ix]} \n" for ix in Gold_index)
                 prompt = RAG_prompt + references_str + "\n#QUESTION#" + f"{question}"
                 response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
             
                 if itera_num == 1:
                     sentence = question + " answer:" + response
                     coher = self.PCM(sentence, references_str)
-                    if coher == 'conflict':
+                    if coher == 'Conflict':
                         re_prompt = "The generated sentence is inconsistent with the retrieved paragraph. Please re-answer the question based on the retrieved paragraph but your own knowledge."
                         response, history = self.chat(tokenizer=self.tokenizer, prompt=re_prompt, history=history)
                 return response, urls, retrieved_passages
