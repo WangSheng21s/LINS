@@ -321,7 +321,7 @@ class MedLinker:
     @torch.no_grad()
     def MAIRAG(self, question, filter_with_different_urls=False, topk=5, if_pubmed=True, if_short_sentences=False, local_data_name="", itera_num=1):
         if itera_num > 3:
-            return "None"
+            return "None", [], []
         urls = []
     
         retrieved_passages = []
@@ -373,12 +373,13 @@ class MedLinker:
             print("Model cannot answer the question using its own knowledge, further iteration needed.")
             if itera_num == 2:
                 print("Iteration limit reached. No further iterations.")
-                return "None"
+                return "None", [], []
         
             sub_questions = self.QDM(question)
             sub_questions_answers = []
             for sub_question in sub_questions:
-                sub_question_answer, sub_urls, sub_texts = self.MAIRAG(sub_question, local_data_name=local_data_name, topk=topk, if_pubmed=if_pubmed, itera_num=itera_num+1, if_short_sentences=if_short_sentences)
+                #def Original_RAG(self, question, filter_with_different_urls=False, topk=5, if_pubmed=True, if_short_sentences=False, local_data_name=""):
+                (sub_question_answer, sub_urls, sub_texts) = self.MAIRAG(question=sub_question, local_data_name=local_data_name, topk=topk, if_pubmed=if_pubmed, itera_num=itera_num+1, if_short_sentences=if_short_sentences)
                 sub_questions_answers.append(sub_question_answer)
                 urls.extend(sub_urls)
                 retrieved_passages.extend(sub_texts)
