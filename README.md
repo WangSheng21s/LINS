@@ -275,7 +275,8 @@ Next, download the model from [unieval-sum](https://huggingface.co/MingZhong/uni
 ```
 Finally, use the following code to calculate the Link-Eval score:
 ```bash
-linkeval = LinkEval(NLI_path="/data/wangsheng/T5-11B")
+linkeval = LinkEval(NLI_path="./model/MLI/T5-11B", unieval_path="./model/UniEval/unieval-sum")
+
 question = "What are the effects of combining antibiotics and immunotherapy?"
 
 answer = "Combining antibiotics with immunotherapy has demonstrated enhanced treatment efficacy against bacterial infections, particularly in combating drug-resistant pathogens. For instance, the coadministration of Clofazimine (CFZ) and Rapamycin (RAPA) effectively eliminates both multiple and extensively drug-resistant (MDR and XDR) strains of Mycobacterium tuberculosis in a mouse model by boosting T-cell memory and polyfunctional TCM responses, while also reducing latency-associated gene expression in human macrophages [2]. This approach not only improves bacterial clearance but also holds promise for addressing the issue of drug resistance and disease recurrence in tuberculosis. Similarly, N-formylated peptides have shown adjunctive therapeutic effects when combined with anti-tuberculosis drugs (ATDs), conferring additional therapeutic benefits in mouse models of TB by enhancing neutrophil function and reducing bacterial load [3]. These findings highlight the potential of combining antimicrobial and immunomodulatory agents to achieve improved outcomes in bacterial infection treatment."
@@ -285,7 +286,20 @@ refs = ["The advent of drug-resistant pathogens results in the occurrence of stu
 statements = convert_to_statements(answer)
 
 citation_set_precision, citation_precision, citation_recall = linkeval.compute_precision_and_recall(question, statements, refs)
+
 statement_correctness = linkeval.compute_statements_correctness(statements)
+
 stanement_fluency = linkeval.compute_statements_fluency(answer)
 
+"""results
++------------------------------+----------+
+|          Dimensions          |  Score   |
++------------------------------+----------+
+|    citation_set_precision    |  1.00    |
+|      citation_precision      |  1.00    |
+|       citation_recall        |  0.50    |
+|    statement_correctness     |  1.00    |
+|      stanement_fluency       |  0.95    |
++------------------------------+----------+
+"""
 ```
