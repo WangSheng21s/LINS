@@ -275,6 +275,8 @@ Next, download the model from [unieval-sum](https://huggingface.co/MingZhong/uni
 ```
 Finally, use the following code to calculate the Link-Eval score:
 ```bash
+from Link_Eval import LinkEval
+
 linkeval = LinkEval(NLI_path="./model/MLI/T5-11B", unieval_path="./model/UniEval/unieval-sum")
 
 question = "What are the effects of combining antibiotics and immunotherapy?"
