@@ -18,6 +18,7 @@ LINS comes with different functionalities.
 - [**Original Retrieval-Augmented Generation**](#original-retrieval-augmented-generation)
 - [**Multi-Agent Iterative Retrieval-Augmented Generation**](#multi-agent-iterative-retrieval-augmented-generation)
 - [**Integrate Local Knowledge Base for Answering**](#integrate-local-knowledge-base-for-answering)
+- [**Link-Eval Computation**](#Link-Eval Computation)
 
 ## Environmental Preparation
 
