@@ -253,3 +253,7 @@ refs: 'https://www.oncokb.org/entry/1873'
       'https://www.oncokb.org/entry/6001'
 """
 ```
+
+## Link-Eval Computation
+
+![LRAG](./assets/Link-Eval.png)
