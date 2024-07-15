@@ -319,9 +319,13 @@ class MedLinker:
 
 
     @torch.no_grad()
-    def MAIRAG(self, question, filter_with_different_urls=False, topk=5, if_pubmed=True, if_short_sentences=False, local_data_name="", itera_num=1):
+    def MAIRAG(self, question, filter_with_different_urls=False, topk=5, if_pubmed=True, if_short_sentences=False, local_data_name="", itera_num=1, history = None):
+        if history:
+            response, history = self.chat(tokenizer=self.tokenizer, prompt=question, history=history)
+            return response, [], [], history
+
         if itera_num > 3:
-            return "None", [], []
+            return "None", [], [], None
         urls = []
     
         retrieved_passages = []
@@ -331,7 +335,7 @@ class MedLinker:
             search_results = self.keyword_search(retriever_query, topk=5, if_short_sentences=if_short_sentences)
             if search_results:
                 recall_search_results = self.ref_retriever.medlinker_query(
-                    question=retriever_query, data_list=search_results, filter_with_different_urls=False)
+                    question=retriever_query, data_list=search_results, filter_with_different_urls=filter_with_different_urls)
                 rerank_search_results = self.ref_retriever.medlinker_rerank(
                     query=retriever_query, search_results=recall_search_results)
                 refs = self.ref_retriever.medlinker_merage(
@@ -359,7 +363,7 @@ class MedLinker:
                     if coher == 'Conflict':
                         re_prompt = "The generated sentence is inconsistent with the retrieved paragraph. Please re-answer the question based on the retrieved paragraph but your own knowledge."
                         response, history = self.chat(tokenizer=self.tokenizer, prompt=re_prompt, history=history)
-                return response, urls, retrieved_passages
+                return response, urls, retrieved_passages, history
 
         print("Retrieved knowledge did not help answer the question. Checking if the model can answer the question using its own knowledge.")
         SKM_result = self.SKM(question)
@@ -368,12 +372,12 @@ class MedLinker:
             print("question:", question)
             prompt = question
             response, history = self.chat(tokenizer=self.tokenizer, prompt=prompt, history=None)
-            return response, [], []
+            return response, [], [], history
         else:
             print("Model cannot answer the question using its own knowledge, further iteration needed.")
             if itera_num == 2:
                 print("Iteration limit reached. No further iterations.")
-                return "None", [], []
+                return "None", [], [], None
         
             sub_questions = self.QDM(question)
             sub_questions_answers = []
@@ -390,7 +394,7 @@ class MedLinker:
             references_str += 'The last question is: ' + question + "\n"
             response, history = self.chat(tokenizer=self.tokenizer, prompt=references_str, history=None)
             refs = ""
-            return response, urls, retrieved_passages
+            return response, urls, retrieved_passages, history
 
 
     
