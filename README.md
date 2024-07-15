@@ -182,7 +182,8 @@ args.medlinker_ckpt_path = "./model/generator/Qwen1.5-110B-Chat"
 medlinker = load_model(args)
 
 question = "What are the effects of combining antibiotics and immunotherapy?"
-results = medlinker.MAIRAG(question)
+response, urls, retrieved_passages, history = medlinker.MAIRAG(question)
+#response, urls, retrieved_passages, history = medlinker.MAIRAG(question, history = history)#
 
 """results
 answer: Combining antibiotics with immunotherapy has demonstrated enhanced treatment efficacy against bacterial infections, particularly in combating drug-resistant pathogens. For instance, the coadministration of Clofazimine (CFZ) and Rapamycin (RAPA) effectively eliminates both multiple and extensively drug-resistant (MDR and XDR) strains of Mycobacterium tuberculosis in a mouse model by boosting T-cell memory and polyfunctional TCM responses, while also reducing latency-associated gene expression in human macrophages [2]. This approach not only improves bacterial clearance but also holds promise for addressing the issue of drug resistance and disease recurrence in tuberculosis. Similarly, N-formylated peptides have shown adjunctive therapeutic effects when combined with anti-tuberculosis drugs (ATDs), conferring additional therapeutic benefits in mouse models of TB by enhancing neutrophil function and reducing bacterial load [3]. These findings highlight the potential of combining antimicrobial and immunomodulatory agents to achieve improved outcomes in bacterial infection treatment.
