@@ -307,3 +307,7 @@ stanement_fluency = linkeval.compute_statements_fluency(answer)
 +------------------------------+----------+
 """
 ```
+
+# Data available
+
+All the data used in LINS are publicly accessible. The PubMedQA dataset can be obtained from https://pubmedqa.github.io, and the MedQA dataset is available at https://drie.google.com/file/d/1ImYUSLk9JbgHXOemfvyiDiirluZHPeQw/view. The HealthSearchQA data can be accessed from https://www.nature.com/articles/s41586-023-06291-2#Sec59. Additionally, datasets such as LocalTest, PubMedQA*, and GeneMedQA are available at https://figshare.com/projects/LINS/212636.
