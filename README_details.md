@@ -1,14 +1,14 @@
 We will soon update detailed tutorials.
 
-# Documentation 
+# Documentation
 
 LINS comes with different functionalities.
-- [**Keyword Extraction**](#LLM-Selection)
-- [**Keyword Extraction**](#Retriever-Selection)
-- [**Keyword Extraction**](#Database-Selection)
-- [**Keyword Extraction**](#Database-Selection)
-- [**Keyword Extraction**](#Local-Retrieval-Database-Construction)
-- [**Retrieve Evidence**](#retrieve-evidence)
+- [**LLM Selection**](#llm-selection)
+- [**Retriever Selection**](#retriever-selection)
+- [**Database Selection**](#database-selection)
+- [**Local Retrieval Database Construction**](#local-retrieval-database-construction)
+- [**Keyword Extraction**](#keyword-extraction)
+- [**Retrieve Evidence Using KED**](#retrieve-evidence-using-ked)
 - [**Direct Multi-Round Q&A**](#direct-multi-round-qa)
 - [**Original Retrieval-Augmented Generation**](#original-retrieval-augmented-generation)
 - [**Multi-Agent Iterative Retrieval-Augmented Generation**](#multi-agent-iterative-retrieval-augmented-generation)
