@@ -12,26 +12,26 @@ LINS comes with different functionalities.
 - [**Direct Multi-Round Q&A**](#direct-multi-round-qa)
 - [**Original Retrieval-Augmented Generation**](#original-retrieval-augmented-generation)
 - [**Multi-Agent Iterative Retrieval-Augmented Generation**](#multi-agent-iterative-retrieval-augmented-generation)
-- [**Link-Eval Computation**](
+- [**Link-Eval Computation**](#link-eval-computation)
 
-#LLM-Selection
+## LLM-Selection
 
-#Retriever-Selection
+## Retriever-Selection
 
-#Database-Selection
+## Database-Selection
 
-#Local-Retrieval-Database-Construction
+## Local-Retrieval-Database-Construction
 
-#Keyword Extraction
+## Keyword Extraction
 
-#Retrieve Evidence using KED
+## Retrieve Evidence using KED
 
-#Direct Multi-Round Q&A
+## Direct Multi-Round Q&A
 
-#Original Retrieval-Augmented Generation
+## Original Retrieval-Augmented Generation
 
-#Multi-Agent Iterative Retrieval-Augmented Generation
+## Multi-Agent Iterative Retrieval-Augmented Generation
 
-#Link-Eval Computation
+## Link-Eval Computation
 
-#Data available
+## Data available
