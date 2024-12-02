@@ -22,6 +22,7 @@ class UniEvaluator:
         self.pos_id = self.tokenizer("Yes")["input_ids"][0]
         self.neg_id = self.tokenizer("No")["input_ids"][0]
 
+    
     def score(self, inputs, batch_size=8):
         """
             Get scores for the given samples.
