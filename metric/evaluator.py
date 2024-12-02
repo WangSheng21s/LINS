@@ -5,6 +5,7 @@ from metric.scorer import UniEvaluator
 sys.path.append("..")
 from utils import add_question, print_scores
 
+
 class SumEvaluator:
     def __init__(self, max_length=1024, device='cuda:0', cache_dir=None, model_path = "./model/UniEval/unieval-sum"):
         """ Set up evaluator for text summarization """
