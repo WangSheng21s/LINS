@@ -120,4 +120,3 @@ class ReferenceFilter:
             #return indices, scores[indices], [self.text_list[x] for x in indices], [self.url_list[x] for x in indices], [self.title_list[x] for x in indices]
             #return [paragraphs[idx] for idx in indices]
 
-Ref = ReferenceFilter("/data/wangsheng/MedLinker/model/retriever/bge/bge-m3", device="cuda:0")
