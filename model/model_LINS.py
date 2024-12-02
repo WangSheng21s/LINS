@@ -364,7 +364,7 @@ class LINS:
 
 
     @torch.no_grad()
-    def AEBMP(self, patient_information, clinical_question="", PICO_question="", topk=3, if_SKM=False, if_QDA=False):
+    def AEBMP(self, patient_information, clinical_question="", PICO_question="", topk=3, if_SKM=False, if_QDA=False, if_guidelines=False):
         assert PICO_question or clinical_question
         if not PICO_question :
             print("generate PICO question...")
@@ -372,7 +372,7 @@ class LINS:
             print("PICO question:", PICO_question)
         if not clinical_question:
             clinical_question = PICO_question
-        retrieved_passages, urls = self.HERD_search(PICO_question=PICO_question, topk=topk, if_guidelines=True, if_pubmed=True, if_bing=True)
+        retrieved_passages, urls = self.HERD_search(PICO_question=PICO_question, topk=topk, if_guidelines=if_guidelines, if_pubmed=True, if_bing=True)
         if len(retrieved_passages) > 0:
             references_str = ''.join(f"[{ix+1}] {retrieved_passages[ix]} \n" for ix in range(len(retrieved_passages)))
             AEBMP_prompt = prompts_dict["AEBMP_prompt"]
@@ -400,7 +400,7 @@ class LINS:
                 urls = []
                 for sub_question in question_list:
                     print("Retrieving passages for sub-question...")
-                    sub_retrieved_passages, sub_urls = self.HERD_search(sub_question, topk=1, if_guidelines=True, if_pubmed=True, if_bing=True)
+                    sub_retrieved_passages, sub_urls = self.HERD_search(sub_question, topk=1, if_guidelines=if_guidelines, if_pubmed=True, if_bing=True)
                     if sub_retrieved_passages:
                         retrieved_passages.extend(sub_retrieved_passages)
                         urls.extend(sub_urls)
