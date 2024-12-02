@@ -6,8 +6,6 @@ import re
 from utils import convert_to_json
 from metric.evaluator import get_evaluator
 
-
-
 t5_11b_path = "./model/NLI/T5-11B"
 
 
