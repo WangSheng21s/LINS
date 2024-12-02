@@ -60,11 +60,14 @@ from model.model_LINS import LINS
 
 lins = LINS() # Initialization
 
-response, history = lins.chat(question="hello") #Direct Multi-Round Q&A
+#Direct Multi-Round Q&A
+response, history = lins.chat(question="hello") 
 
 #Generating Citation-Based Generative Text using  the MAIRAG algorithm
 response, urls, retrieved_passages, history, sub_questions = lins.MAIRAG(question="For Parkinson's disease, whether prasinezumab showed greater benefits on motor signs progression in prespecified subgroups with faster motor progression?")
 
+#Generating Evidence-Based Recommendations for Evidence-Based Medicine Practice
+response, urls, retrieved_passages, history, PICO_question = lins.AEBMP(patient_information="A 76-year-old female patient was admitted to the hospital due to "numbness in the left lower limb for 1 year and involuntary tremors in the right lower limb for more than 3 months." The patient reported experiencing numbness in the left lower limb a year ago without any apparent trigger, for which no specific treatment was administered. Three months ago, she began experiencing involuntary tremors in the right lower limb without any apparent cause. The tremors intensified during moments of mental tension or emotional excitement and eased during sleep. Tremors were also observed in the right upper limb when holding objects, accompanied by difficulty initiating walking, feelings of fatigue, and memory decline, primarily affecting recent memory. She reported no additional symptoms, such as decreased sense of smell, shortness of breath, chest tightness, frequent nightmares, suspiciousness, or limb numbness. The patient sought medical attention at a local hospital, where she was diagnosed with "Parkinson's disease" and prescribed "Tasud 50 mg, three times daily." Two months ago, she experienced a coma after taking the medication, with no response to external stimuli, and was urgently taken to the local hospital, where her blood glucose level was measured at 1.4 mmol/L. Her condition improved after receiving appropriate symptomatic treatment. She is currently taking "Madopar 125 mg, three times daily" regularly, is able to perform fine motor tasks adequately, and can manage daily activities independently. Since the onset of her illness, she has had a generally stable mental state, with a normal appetite, good sleep, bowel movements every 2-3 days, normal urination, and no significant changes in body weight.", PICO_question="For Parkinson's disease, whether prasinezumab showed greater benefits on motor signs progression in prespecified subgroups with faster motor progression?", if_guidelines=False)
 
 ```
 
