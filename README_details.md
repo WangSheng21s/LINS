@@ -56,16 +56,21 @@ lins = LINS(LLM_name='gpt-4o', retriever_name='text-embedding-3-large')
 ```
 
 ## Database-Selection
+LINS allows users to select the appropriate retrieval database based on their specific needs. Currently, it supports both local retrieval databases and online retrieval databases, including PubMed, Bing, and local retrieval databases. We plan to continuously update and integrate new retrieval databases in the future. For detailed instructions on constructing a local retrieval database, please refer to our guide on [**Local Retrieval Database Construction**](#local-retrieval-database-construction).
+
+You can select a specific retrieval database through the following parameters:
+```bash
+from model.model_LINS import LINS
+
+#'pubmed', 'bing' or {your local database name} is available.
+lins = LINS(LLM_name='gpt-4o', retriever_name='text-embedding-3-large', database_name='pubmed')
+```
 
 ## Local-Retrieval-Database-Construction
 
-## Keyword Extraction
-
-## Retrieve Evidence using KED
 
 ## Direct Multi-Round Q&A
 
-## Original Retrieval-Augmented Generation
 
 ## Multi-Agent Iterative Retrieval-Augmented Generation
 
