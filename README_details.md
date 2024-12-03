@@ -1,5 +1,3 @@
-We will soon update detailed tutorials.
-
 # Documentation
 
 LINS comes with different functionalities.
