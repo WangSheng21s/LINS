@@ -299,13 +299,11 @@ class LINS:
     @torch.no_grad()    
     def HERD_search(self, PICO_question, topk=5, if_guidelines=True, if_pubmed=True, if_bing=True):#指南最多同时用三篇
         print("HERD search...")
-        if not self.HERD_guidelines:
-            self.HERD_guidelines = LINS_Database(database_name='guidelines', retriever=self.retriever)
-            self.HERD_pubmed = LINS_Database(database_name='pubmed', retriever=self.retriever)
-            self.HERD_bing = LINS_Database(database_name='bing', retriever=self.retriever)
         retrieved_passages = []
         urls = []
         if if_guidelines != "":#第一级检索
+            if not self.HERD_guidelines:
+                self.HERD_guidelines = LINS_Database(database_name='guidelines', retriever=self.retriever)
             print("HERD_Guidelines search...")
             retrieved = self.HERD_guidelines.get_data_list(question=PICO_question, retmax=topk)
             retrieved_passages = retrieved['texts']
@@ -325,6 +323,8 @@ class LINS:
                 urls = []
                 #return retrieved_passages, urls#暂时只看找到了local的情况
         if if_pubmed:  
+            if not self.HERD_pubmed:
+                self.HERD_pubmed = LINS_Database(database_name='pubmed', retriever=self.retriever)
             print("HERD_Pubmed search...")
             retrieved = self.get_passages(question=PICO_question, topk=topk, if_split_n=False, database=self.HERD_pubmed)
             if retrieved and retrieved['texts']:
@@ -344,6 +344,8 @@ class LINS:
                     #return retrieved_passages, urls
         if if_bing:
             print("HERD_Bing search...")
+            if not self.HERD_bing:
+                self.HERD_bing = LINS_Database(database_name='bing', retriever=self.retriever)
             retrieved = self.get_passages(question=PICO_question, topk=topk, if_split_n=False, database=self.HERD_bing)
             if retrieved and retrieved['texts']:
                 retrieved_passages = retrieved['texts']
