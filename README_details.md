@@ -7,13 +7,9 @@ LINS comes with different functionalities.
 - [**Retriever Selection**](#retriever-selection)
 - [**Database Selection**](#database-selection)
 - [**Local Retrieval Database Construction**](#local-retrieval-database-construction)
-- [**Keyword Extraction**](#keyword-extraction)
-- [**Retrieve Evidence Using KED**](#retrieve-evidence-using-ked)
-- [**Direct Multi-Round Q&A**](#direct-multi-round-qa)
-- [**Original Retrieval-Augmented Generation**](#original-retrieval-augmented-generation)
-- [**Multi-Agent Iterative Retrieval-Augmented Generation**](#multi-agent-iterative-retrieval-augmented-generation)
-- [**Link-Eval Computation**](#link-eval-computation)
-
+- [**Usage Examples**](#usage-examples)
+- [**Privacy Protection Settings**](#privacy-protection-settings)
+- [**Multi-Agent Selection**](#multi-agent-selection)
 ## LLM-Selection
 LINS allows users to select the appropriate LLM based on their specific needs. Currently, it supports LLMs from four families: GPT, Gemini, Qwen, and Llama, with plans to continuously update and integrate new LLMs in the future.
 
@@ -95,58 +91,78 @@ LINS supports users in building personalized local retrieval databases. Below, w
 
 This allows you to leverage the OncoKB local database for advanced, retrieval-augmented AI capabilities in your application.
 
-## Direct Multi-Round Q&A
 
+### Explanation:
+- **LLM_name**: Specifies the local LLM to use (in this case, `qwen2.5-72b`).
+- **retriever_name**: Sets the local retrieval model (here, `BGE`).
+- **database_name**: Defines the local database used for retrieval (in this case, `oncokb`).
 
-## Multi-Agent Iterative Retrieval-Augmented Generation
-
-## Link-Eval Computation
-
-![Link-Eval](./assets/Link-Eval1.png)
-If you want to use Link-Eval to evaluate the quality of citation-based generative text (CBGT), please follow the steps below to set up the environment and encapsulate the data.
-
-First, set up the environment:
+This setup ensures that all operations are performed locally, without any data leaving the user’s environment, offering a higher level of privacy protection.
+## Usage-Examples
+We provide examples of the main use cases of LINS, utilizing the GPT-4o LLM, the `text-embedding-3-large` retriever, and the PubMed retrieval database. Please ensure you set the environment variable beforehand: 
 ```bash
-pip install prettytable
-pip install sentencepiece
+export OPENAI_API_KEY=YOUR_KEY
 ```
-Next, download the model from [unieval-sum](https://huggingface.co/MingZhong/unieval-sum) and store it in the following directory:
 ```bash
-├──model
-│   ├──retriever
-│   ├──UniEval
-│   │   ├──unieval-sum
+from model.model_LINS import LINS
+
+lins = LINS() # Initialization
+
+#Direct Multi-Round Q&A
+response, history = lins.chat(question="hello") 
+
+#Generating Citation-Based Generative Text using  the MAIRAG algorithm
+response, urls, retrieved_passages, history, sub_questions = lins.MAIRAG(question="For Parkinson's disease, whether prasinezumab showed greater benefits on motor signs progression in prespecified subgroups with faster motor progression?")
+
+#Generating Evidence-Based Recommendation for Evidence-Based Medicine Practice
+response, urls, retrieved_passages, history, PICO_question = lins.AEBMP(PICO_question="For Parkinson's disease, whether prasinezumab showed greater benefits on motor signs progression in prespecified subgroups with faster motor progression?", if_guidelines=False, patient_information="A 76-year-old female patient was admitted to the hospital due to "numbness in the left lower limb for 1 year and involuntary tremors in the right lower limb for more than 3 months." The patient reported experiencing numbness in the left lower limb a year ago without any apparent trigger, for which no specific treatment was administered. Three months ago, she began experiencing involuntary tremors in the right lower limb without any apparent cause. The tremors intensified during moments of mental tension or emotional excitement and eased during sleep. Tremors were also observed in the right upper limb when holding objects, accompanied by difficulty initiating walking, feelings of fatigue, and memory decline, primarily affecting recent memory. She reported no additional symptoms, such as decreased sense of smell, shortness of breath, chest tightness, frequent nightmares, suspiciousness, or limb numbness. The patient sought medical attention at a local hospital, where she was diagnosed with "Parkinson's disease" and prescribed "Tasud 50 mg, three times daily." Two months ago, she experienced a coma after taking the medication, with no response to external stimuli, and was urgently taken to the local hospital, where her blood glucose level was measured at 1.4 mmol/L. Her condition improved after receiving appropriate symptomatic treatment. She is currently taking "Madopar 125 mg, three times daily" regularly, is able to perform fine motor tasks adequately, and can manage daily activities independently. Since the onset of her illness, she has had a generally stable mental state, with a normal appetite, good sleep, bowel movements every 2-3 days, normal urination, and no significant changes in body weight.")
+
+#Generating Evidence-Based Answers for Medical Order Explanation to Patients
+medical_term_explanations, clinical_answer = lins.MOEQA(if_QA=True, if_explanation=True, question="Why do I have ischemic bowel disease?", explain_text="Preliminary Diagnosis: Ischemic Bowel Disease.\nManagement: Instructed patient to rest in bed, avoid stress, keep nil by mouth, provide continuous oxygen inhalation, fluid replacement to maintain water and electrolyte balance, use papaverine hydrochloride to relieve spasms and pain, dilate blood vessels to maintain blood flow, and observe symptoms the next day.", patient_information="Gender: Female, Age: 53 years\nChief Complaint: Admitted for \"recurrent abdominal pain and bloating for over 2 years.\"\nCurrent Illness History: The patient experienced abdominal pain 2 years ago, especially under the xiphoid process, presenting as intermittent dull pain and discomfort, with episodes lasting variable durations, aggravated after a full meal, accompanied by bloating, bitter mouth, fatigue, without cough or sputum, chills, or fever. Local hospital's gastroscopy diagnosed chronic gastritis, treated with oral Zhi Shu Kuang Zhong Capsules, Domperidone Tablets, etc. with symptoms improving occasionally but easily recurring. Four days ago, a broad-based polyp about 0.6 cm in diameter was found in the hepatic flexure and removed with endoscopic clipping, with no abnormalities observed in the rest of the colon and rectum; on the first postoperative day, the patient experienced abdominal cramps and frequent bloody stools.\nPast History: No history of hypertension, diabetes, coronary artery disease; no drug or food allergies, no history of ulcerative colitis or Crohn's disease, no history of hematological diseases.\nPhysical Examination: Pulse 71/min, Respiration 20/min, Blood pressure 120/80 mmHg (1 mmHg=0.133 kPa). Abdomen flat, no gastrointestinal shape or peristaltic wave observed, no abdominal wall varicosities, whole abdomen soft, tenderness under xiphoid and around navel, no rebound tenderness or muscle tension, liver and spleen not palpable below ribs. Murphy sign negative. Whole abdomen without palpable mass, shifting dullness negative, no knocking pain in liver and kidney areas, bowel sounds 4/min.\nAuxiliary Examination: No abnormalities in routine blood tests and coagulation function tests. Colonoscopy: diffuse dark red and purplish-red changes in descending colon and sigmoid colon mucosa, significant swelling with multiple patchy erosions and irregular shallow ulcers, bruising; observation of post-polypectomy site revealed a clip device in place, no bleeding points found; Abdominal enhanced CT: swelling of the descending and sigmoid colon with multiple small blood vessels showing around normally contrasting bowel segments, abdominal vascular CTA showed clear mesenteric artery and major branches, no thrombosis or significant stenosis noted.\nPreliminary Diagnosis: Ischemic Bowel Disease.\nManagement: Instructed patient to rest in bed, avoid stress, keep nil by mouth, provide continuous oxygen inhalation, fluid replacement to maintain water and electrolyte balance, use papaverine hydrochloride to relieve spasms and pain, dilate blood vessels to maintain blood flow, and observe symptoms the next day.")
 ```
-Finally, use the following code to calculate the Link-Eval score:
-```bash
-from Link_Eval import LinkEval, convert_to_statements
 
-linkeval = LinkEval(NLI_path="./model/MLI/T5-11B", unieval_path="./model/UniEval/unieval-sum")
+## Privacy-Protection-Settings
+If you have very high privacy protection requirements, LINS supports building fully localized configurations to ensure that your data remains entirely protected on-premise, without being uploaded to the internet or exposed to potential data breaches. Below is an example of how to set up a fully localized configuration:
 
-question = "What are the effects of combining antibiotics and immunotherapy?"
+### Fully Localized Configuration Example:
 
-answer = "Combining antibiotics with immunotherapy has demonstrated enhanced treatment efficacy against bacterial infections, particularly in combating drug-resistant pathogens. For instance, the coadministration of Clofazimine (CFZ) and Rapamycin (RAPA) effectively eliminates both multiple and extensively drug-resistant (MDR and XDR) strains of Mycobacterium tuberculosis in a mouse model by boosting T-cell memory and polyfunctional TCM responses, while also reducing latency-associated gene expression in human macrophages [2]. This approach not only improves bacterial clearance but also holds promise for addressing the issue of drug resistance and disease recurrence in tuberculosis. Similarly, N-formylated peptides have shown adjunctive therapeutic effects when combined with anti-tuberculosis drugs (ATDs), conferring additional therapeutic benefits in mouse models of TB by enhancing neutrophil function and reducing bacterial load [3]. These findings highlight the potential of combining antimicrobial and immunomodulatory agents to achieve improved outcomes in bacterial infection treatment."
+```python
+from model.model_LINS import LINS
 
-refs = ["The advent of drug-resistant pathogens results in the occurrence of stubborn bacterial infections that cannot be treated with traditional antibiotics. Antibacterial immunotherapy by reviving or activating the body's immune system to eliminate pathogenic bacteria has confirmed promising therapeutic strategies in controlling bacterial infections. Subsequent studies found that antimicrobial immunotherapy has its own benefits and limitations, such as avoiding recurrence of infection and autoimmunity-induced side effects. Current studies indicate that the various antibacterial therapeutic strategies inducing immune regulation can achieve superior therapeutic efficacy compared with monotherapy alone. Therefore, summarizing the recent advances in nanomedicine with immunomodulatory functions for combating bacterial infections is necessary. Herein, we briefly introduce the crisis caused by drug-resistant bacteria and the opportunity for antibacterial immunotherapy. Then, immune-involved multimodal antibacterial therapy for the treatment of infectious diseases was systematically summarized. Finally, the prospects and challenges of immune-involved combinational therapy are discussed.", "Mycobacterium tuberculosis, the causative agent of tuberculosis, is acquiring drug resistance at a faster rate than the discovery of new antibiotics. Therefore, alternate therapies that can limit the drug resistance and disease recurrence are urgently needed. Emerging evidence indicates that combined treatment with antibiotics and an immunomodulator provides superior treatment efficacy. Clofazimine (CFZ) enhances the generation of T central memory (TCM) cells by blocking the Kv1.3+ potassium channels. Rapamycin (RAPA) facilitates M. tuberculosis clearance by inducing autophagy. In this study, we observed that cotreatment with CFZ and RAPA potently eliminates both multiple and extensively drug-resistant (MDR and XDR) clinical isolates of M. tuberculosis in a mouse model by inducing robust T-cell memory and polyfunctional TCM responses. Furthermore, cotreatment reduces the expression of latency-associated genes of M. tuberculosis in human macrophages. Therefore, CFZ and RAPA cotherapy holds promise for treating patients infected with MDR and XDR strains of M. tuberculosis.", "Objective: The current therapeutic regimens for tuberculosis (TB) are complex and involve the prolonged use of multiple antibiotics with diverse side effects that lead to therapeutic failure and bacterial resistance. The standard appliance of immunotherapy may aid as a powerful tool to combat the ensuing threat of TB. We have earlier reported the immunotherapeutic potential of N-formylated peptides of two secretory proteins of Mycobacterium tuberculosis H37Rv. Here, we investigated the immunotherapeutic effect of an N-formylated peptide from Listeria monocytogenes in experimental TB. Methods: The N-terminally formylated listerial peptide with amino acid sequence 'f-MIGWII' was tested for its adjunctive therapeutic efficacy in combination with anti-tuberculosis drugs (ATDs) in the mouse model of TB. In addition, its potential to generate reactive oxygen species (ROS) in murine neutrophils was also evaluated. Results: The LemA peptide (f-MIGWII) induced a significant increase in the intracellular ROS levels of mouse neutrophils (p ≤ .05). The ATD treatment reduced the colony forming units (CFU) in lungs and spleen of infected mice by 2.39 and 1.67 log10 units, respectively (p < .001). Treatment of the infected mice with combination of ATDs and LemA peptide elicited higher therapeutic efficacy over ATDs alone. The histopathological changes in the lungs of infected mice also correlated well with the CFU data. Conclusions: Our results clearly indicate that LemA peptide conferred an additional therapeutic effect when given in combination with the ATDss (p < .01) and hence can be used as adjunct to the conventional chemotherapy against TB.", "Recurrent urinary tract infections (RUTIs) and recurrent vulvovaginal candidiasis (RVVCs) represent major healthcare problems with high socio-economic impact worldwide. Antibiotic and antifungal prophylaxis remain the gold standard treatments for RUTIs and RVVCs, contributing to the massive rise of antimicrobial resistance, microbiota alterations and co-infections. Therefore, the development of novel vaccine strategies for these infections are sorely needed. The sublingual heat-inactivated polyvalent bacterial vaccine MV140 shows clinical efficacy for the prevention of RUTIs and promotes Th1/Th17 and IL-10 immune responses. V132 is a sublingual preparation of heat-inactivated Candida albicans developed against RVVCs. A vaccine formulation combining both MV140 and V132 might well represent a suitable approach for concomitant genitourinary tract infections (GUTIs), but detailed mechanistic preclinical studies are still needed. Herein, we showed that the combination of MV140 and V132 imprints human dendritic cells (DCs) with the capacity to polarize potent IFN-γ- and IL-17A-producing T cells and FOXP3+ regulatory T (Treg) cells. MV140/V132 activates mitogen-activated protein kinases (MAPK)-, nuclear factor-κB (NF-κB)- and mammalian target of rapamycin (mTOR)-mediated signaling pathways in human DCs. MV140/V132 also promotes metabolic and epigenetic reprogramming in human DCs, which are key molecular mechanisms involved in the induction of innate trained immunity. Splenocytes from mice sublingually immunized with MV140/V132 display enhanced proliferative responses of CD4+ T cells not only upon in vitro stimulation with the related antigens contained in the vaccine formulation but also upon stimulation with phytohaemagglutinin. Additionally, in vivo sublingual immunization with MV140/V132 induces the generation of IgG and IgA antibodies against all the components contained in the vaccine formulation. We uncover immunological mechanisms underlying the potential mode of action of a combination of MV140 and V132 as a novel promising trained immunity-based vaccine (TIbV) for GUTIs.", "Helicobacter pylori is a gram negative, spiral, microaerophylic bacterium that infects the stomach of more than 50% of the human population worldwide. It is mostly acquired during childhood and, if not treated, persists chronically, causing chronic gastritis, peptic ulcer disease, and in some individuals, gastric adenocarcinoma and gastric B cell lymphoma. The current therapy, based on the use of a proton-pump inhibitor and antibiotics, is efficacious but faces problems such as patient compliance, antibiotic resistance, and possible recurrence of infection. The development of an efficacious vaccine against H. pylori would thus offer several advantages. Various approaches have been followed in the development of vaccines against H. pylori, most of which have been based on the use of selected antigens known to be involved in the pathogenesis of the infection, such as urease, the vacuolating cytotoxin (VacA), the cytotoxin-associated antigen (CagA), the neutrophil-activating protein (NAP), and others, and intended to confer protection prophylactically and/or therapeutically in animal models of infection. However, very little is known of the natural history of H. pylori infection and of the kinetics of the induced immune responses. Several lines of evidence suggest that H. pylori infection is accompanied by a pronounced Th1-type CD4(+) T cell response. It appears, however, that after immunization, the antigen-specific response is predominantly polarized toward a Th2-type response, with production of cytokines that can inhibit the activation of Th1 cells and of macrophages, and the production of proinflammatory cytokines. The exact effector mechanisms of protection induced after immunization are still poorly understood. The next couple of years will be crucial for the development of vaccines against H. pylori. Several trials are foreseen in humans, and expectations are that most of the questions being asked now on the host-microbe interactions will be answered."]
-    
-statements = convert_to_statements(answer)
+# Initialize LINS with a local configuration
+lins = LINS(LLM_name="qwen2.5-72b", retriever_name='BGE', database_name='oncokb')
 
-citation_set_precision, citation_precision, citation_recall = linkeval.compute_precision_and_recall(question, statements, refs)
-
-statement_correctness = linkeval.compute_statements_correctness(statements)
-
-stanement_fluency = linkeval.compute_statements_fluency(answer)
-
-"""results
-+------------------------------+----------+
-|          Dimensions          |  Score   |
-+------------------------------+----------+
-|    citation_set_precision    |  1.00    |
-|      citation_precision      |  1.00    |
-|       citation_recall        |  0.50    |
-|    statement_correctness     |  1.00    |
-|      stanement_fluency       |  0.95    |
-+------------------------------+----------+
-"""
+# Perform a retrieval-augmented question-answering task
+lins.MAIRAG(question="What is BCR-ABL1?")
 ```
-## Data available
+
+## Multi-Agent-Selection
+The **MAIRAG** algorithm provides higher quality answers, but it comes with higher token and time consumption compared to the original RAG algorithm. If users prefer faster responses with lower costs, LINS allows users to disable the multi-agent components, effectively reverting the MAIRAG algorithm to the original RAG algorithm.
+
+Here is how you can configure LINS to disable the multi-agent modules and use the original RAG algorithm for faster and more cost-efficient service:
+
+### Disable Multi-Agent Modules and Use Original RAG:
+
+```python
+from model.model_LINS import LINS
+
+# Initialize LINS with specific settings
+lins = LINS(LLM_name='gpt-4o', retriever_name='text-embedding-3-large', database_name='pubmed')
+
+# Use MAIRAG with disabled multi-agent features to revert to RAG
+response, urls, retrieved_passages, history, sub_questions = lins.MAIRAG(
+    question="What is BCR-ABL1?",  
+    if_PRA=False,  
+    if_SKA=False,  
+    if_QDA=False, 
+    if_PCA=False  
+)
+```
+
+### Explanation:
+- **if_PRA=False**: Disables the Passage Relevant Agent.
+- **if_SKA=False**: Disables the Self-Knowledge Agent.
+- **if_QDA=False**: Disables the Question Decomposition Agent.
+- **if_PCA=False**: Disables the Passage Coherence Agent.
+
+By setting these options to `False`, you will use the original RAG algorithm, resulting in faster responses with reduced token usage and lower overall consumption.
