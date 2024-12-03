@@ -301,7 +301,7 @@ class LINS:
         print("HERD search...")
         retrieved_passages = []
         urls = []
-        if if_guidelines != "":#第一级检索
+        if if_guidelines:#第一级检索
             if not self.HERD_guidelines:
                 self.HERD_guidelines = LINS_Database(database_name='guidelines', retriever=self.retriever)
             print("HERD_Guidelines search...")
