@@ -14,7 +14,7 @@ We developed LINS, a multi-agent retrieval-augmented framework seamlessly adapta
 Clone this repo, and install python requirements.
 
 ```bash
-conda create --name LINS python=3.11.6
+conda create --name LINS python=3.11.6 -c conda-forge
 conda activate LINS
 pip install -r requirements.txt
 conda install -c pytorch faiss-gpu
