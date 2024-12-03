@@ -44,6 +44,16 @@ lins = LINS(LLM_name='o1-preview', assistant_LLM_name='gpt-4o')
 
 
 ## Retriever-Selection
+LINS allows users to select the appropriate retriever based on their specific needs. Currently, it supports retrievers from both OpenAI and open-source models: text-embedding-ada-2, text-embedding-3-small, text-embedding-3-large, and BGE (text-embedding- retrievers need OPEN_API_KEY). We plan to continuously update and integrate new retrievers in the future.
+
+You can select a specific retriever through the following parameters:
+```bash
+from model.model_LINS import LINS
+
+#'text-embedding-3-small', 'text-embedding-3-large', 'text-embedding-ada-2', 'BGE' is available.
+#The first time you use the BGE model, it will download the corresponding model from Hugging Face. Please ensure that your network connection is stable.
+lins = LINS(LLM_name='gpt-4o', retriever_name='text-embedding-3-large')
+```
 
 ## Database-Selection
 
