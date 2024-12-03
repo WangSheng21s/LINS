@@ -19,3 +19,7 @@ tqdm==4.66.1
 transformers==4.40.1
 openai
 accelerate
+ollama
+google-generativeai
+FlagEmbedding
+peft
