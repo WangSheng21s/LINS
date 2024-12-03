@@ -23,6 +23,8 @@ class LINS:
         self.retriever = LINS_Retriever(retriever_name, max_thread=retriever_max_thread, OPEN_API_KEY=retriever_api_keys, BGE_encoder_path=BGE_encoder_path)
         self.database = LINS_Database(database_name, retriever=self.retriever, local_data_path=local_data_path)
         self.HERD_guidelines = None
+        self.HERD_pubmed = None
+        self.HERD_bing = None
         
 
     @torch.no_grad()
