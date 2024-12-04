@@ -1,7 +1,7 @@
 <h1> LINS: A Multi-Agent Retrieval-Augmented Framework for Enhancing the Quality and Credibility of LLMs’ Medical Responses</h1>
 
 <div align="justify">
-We developed LINS, a multi-agent retrieval-augmented framework seamlessly adaptable to any medical vertical without additional training or fine-tuning. Additionally, LINS introduces innovative algorithms, including Multi-Agent Iterative Retrieval Augmented Generation (MAIRAG) algorithm and Keyword Extraction Degradation (KED), aiming to generate high-quality Citation-Based Generative Text (CBGT). Furthermore, we proposed the Link-Eval automated evaluation system to assess CBGT quality.LINS achieved state-of-the-art (SOTA) performance in both subjective and human evaluations on specialized medical datasets. Additionally, we showcased the promising potential of LINS in real clinical scenarios, including assisting physicians in evidence-based medical practice and helping patients with medical order explanation, yielding encouraging results. In conclusion, LINS serves as a general medical question-answering framework that helps LLMs overcome limitations, effectively improving the quality and credibility of medical responses. Our study demonstrates that retrieving high-quality evidence enables LLMs to generate superior medical responses, and that providing evidence-traceable formats enhances credibility. This approach helps overcome user trust barriers toward LLMs, thereby increasing their applicability and value in the medical field.
+We developed LINS, a multi-agent retrieval-augmented framework seamlessly adaptable to any medical vertical without additional training or fine-tuning. Additionally, LINS introduces innovative algorithms, including Multi-Agent Iterative Retrieval Augmented Generation (MAIRAG) algorithm and Keyword Extraction Degradation (KED) algorithm, aiming to generate high-quality Citation-Based Generative Text (CBGT). Furthermore, we proposed the Link-Eval automated evaluation system to assess CBGT quality. LINS achieved state-of-the-art (SOTA) performance in both subjective and human evaluations on specialized medical datasets. Additionally, we showcased the promising potential of LINS in real clinical scenarios, including assisting physicians in evidence-based medical practice and helping patients with medical order explanation, yielding encouraging results. In conclusion, LINS serves as a general medical question-answering framework that helps LLMs overcome limitations, effectively improving the quality and credibility of medical responses. Our study demonstrates that retrieving high-quality evidence enables LLMs to generate superior medical responses, and that providing evidence-traceable formats enhances credibility. This approach helps overcome user trust barriers toward LLMs, thereby increasing their applicability and value in the medical field.
 </div>
 
 <br>
@@ -11,18 +11,22 @@ We developed LINS, a multi-agent retrieval-augmented framework seamlessly adapta
 
 ## Environmental Preparation
 
-Clone this repo, and install python requirements.
+Clone this repo.
 ```bash
 git clone https://github.com/WangSheng21s/LINS.git
 cd LINS
 ```
+
+Create a conda environment and activate it.
 ```bash
 conda create --name LINS python=3.11.6 -c conda-forge
 conda activate LINS
 pip install -r requirements.txt
 ```
 
-Install torch
+Install python requirements.
+Install torch.
+
 ```bash
 pip install torch==2.1.0+cu118 torchvision torchaudio -f https://download.pytorch.org/whl/cu118/torch_stable.html
 ```
@@ -34,9 +38,13 @@ apt install nodejs # If you use Ubuntu
 ```
 
 Then, set the environment variable `OPEN_API_KEY`/`GEMINI_KEY` to your key if you want to use Openai/Gemini API.
-
+If you want to use Openai API,
 ```bash
 export OPEN_API_KEY=YOUR_KEY
+```
+
+If you want to use Gemini API,
+```bash
 export GEMINI_KEY=YOUR_KEY
 ```
 
@@ -55,12 +63,12 @@ os.environ['OPENAI_API_KEY'] = 'YOUR_KEY'
 ```bash
 from model.model_LINS import LINS
 
-lins = LINS() # Initialization
+lins = LINS() # Initialization, default use of the GPT-4o LLM, the `text-embedding-3-large` retriever, and the PubMed retrieval database.
 
 #Direct Multi-Round Q&A
 response, history = lins.chat(question="hello") 
 
-#Generating Citation-Based Generative Text using  the MAIRAG algorithm
+#Generating Citation-Based Generative Text using LINS including the MAIRAG and KED algorithm
 response, urls, retrieved_passages, history, sub_questions = lins.MAIRAG(question="For Parkinson's disease, whether prasinezumab showed greater benefits on motor signs progression in prespecified subgroups with faster motor progression?")
 
 #Generating Evidence-Based Recommendation for Evidence-Based Medicine Practice
@@ -69,4 +77,5 @@ response, urls, retrieved_passages, history, PICO_question = lins.AEBMP(PICO_que
 #Generating Evidence-Based Answers for Medical Order Explanation to Patients
 medical_term_explanations, clinical_answer = lins.MOEQA(if_QA=True, if_explanation=True, question="What causes ischemic bowel disease?", explain_text="Preliminary Diagnosis: Ischemic Bowel Disease.\nManagement: Instructed patient to rest in bed, avoid stress, keep nil by mouth, provide continuous oxygen inhalation, fluid replacement to maintain water and electrolyte balance, use papaverine hydrochloride to relieve spasms and pain, dilate blood vessels to maintain blood flow, and observe symptoms the next day.", patient_information="Gender: Female, Age: 53 years\nChief Complaint: Admitted for \"recurrent abdominal pain and bloating for over 2 years.\"\nCurrent Illness History: The patient experienced abdominal pain 2 years ago, especially under the xiphoid process, presenting as intermittent dull pain and discomfort, with episodes lasting variable durations, aggravated after a full meal, accompanied by bloating, bitter mouth, fatigue, without cough or sputum, chills, or fever. Local hospital's gastroscopy diagnosed chronic gastritis, treated with oral Zhi Shu Kuang Zhong Capsules, Domperidone Tablets, etc. with symptoms improving occasionally but easily recurring. Four days ago, a broad-based polyp about 0.6 cm in diameter was found in the hepatic flexure and removed with endoscopic clipping, with no abnormalities observed in the rest of the colon and rectum; on the first postoperative day, the patient experienced abdominal cramps and frequent bloody stools.\nPast History: No history of hypertension, diabetes, coronary artery disease; no drug or food allergies, no history of ulcerative colitis or Crohn's disease, no history of hematological diseases.\nPhysical Examination: Pulse 71/min, Respiration 20/min, Blood pressure 120/80 mmHg (1 mmHg=0.133 kPa). Abdomen flat, no gastrointestinal shape or peristaltic wave observed, no abdominal wall varicosities, whole abdomen soft, tenderness under xiphoid and around navel, no rebound tenderness or muscle tension, liver and spleen not palpable below ribs. Murphy sign negative. Whole abdomen without palpable mass, shifting dullness negative, no knocking pain in liver and kidney areas, bowel sounds 4/min.\nAuxiliary Examination: No abnormalities in routine blood tests and coagulation function tests. Colonoscopy: diffuse dark red and purplish-red changes in descending colon and sigmoid colon mucosa, significant swelling with multiple patchy erosions and irregular shallow ulcers, bruising; observation of post-polypectomy site revealed a clip device in place, no bleeding points found; Abdominal enhanced CT: swelling of the descending and sigmoid colon with multiple small blood vessels showing around normally contrasting bowel segments, abdominal vascular CTA showed clear mesenteric artery and major branches, no thrombosis or significant stenosis noted.\nPreliminary Diagnosis: Ischemic Bowel Disease.\nManagement: Instructed patient to rest in bed, avoid stress, keep nil by mouth, provide continuous oxygen inhalation, fluid replacement to maintain water and electrolyte balance, use papaverine hydrochloride to relieve spasms and pain, dilate blood vessels to maintain blood flow, and observe symptoms the next day.")
 ```
+
 LINS allows users to flexibly choose the LLM, retriever, and retrieval database based on their specific needs. It also supports the creation of personalized local retrieval databases. Detailed tutorials are provided in [**README_details**](./README_details.md).
