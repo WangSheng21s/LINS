@@ -95,7 +95,8 @@ def generate_embeddings(local_data_name, retriever):
         text_embedding_numpy = retriever.encode(texts)
         text_embedding_dict = []
         for text, embedding in zip(texts, text_embedding_numpy):
-            text_embedding_dict.append({"text": text, "embedding": embedding})
+            if text and embedding:
+                text_embedding_dict.append({"text": text, "embedding": embedding})
         #text_embedding_dict = embed(texts, model_name=model_name)
 
         with open(save_path, "a", encoding='utf-8') as f:
