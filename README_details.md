@@ -148,13 +148,7 @@ from model.model_LINS import LINS
 lins = LINS(LLM_name='gpt-4o', retriever_name='text-embedding-3-large', database_name='pubmed')
 
 # Use MAIRAG with disabled multi-agent features to revert to RAG
-response, urls, retrieved_passages, history, sub_questions = lins.MAIRAG(
-    question="What is BCR-ABL1?",  
-    if_PRA=False,  
-    if_SKA=False,  
-    if_QDA=False, 
-    if_PCA=False  
-)
+response, urls, retrieved_passages, history, sub_questions = lins.MAIRAG(question="What is BCR-ABL1?", if_PRA=False, if_SKA=False, if_QDA=False, if_PCA=False)
 ```
 
 ### Explanation:
