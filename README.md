@@ -66,7 +66,7 @@ from model.model_LINS import LINS
 lins = LINS() # Initialization, default use of the GPT-4o LLM, the `text-embedding-3-large` retriever, and the PubMed retrieval database.
 
 #Direct Multi-Round Q&A
-response, history = lins.chat(question="hello") 
+response, history = lins.chat(question="hello", history=None) 
 
 #Generating Citation-Based Generative Text using LINS including the MAIRAG and KED algorithm
 response, urls, retrieved_passages, history, sub_questions = lins.MAIRAG(question="For Parkinson's disease, whether prasinezumab showed greater benefits on motor signs progression in prespecified subgroups with faster motor progression?")
