@@ -281,7 +281,7 @@ class LINS:
         urls = [retrieved['urls'][i] for i in Gold_index]
         if return_passages:
             return retrieved_passages, urls
-        references_str = ''.join(f"[{ix+1}] {retrieved_passages[ix]} \n" for ix in Gold_index)
+        references_str = ''.join(f"[{ix+1}] {retrieved_passages[ix]} \n" for ix in range(len(retrieved_passages)))
         prompt = RAG_prompt + "\n**Retrieved information**\n" + references_str  + f"**Question**: {question}\n" + "**Answer:**"
         response, history = self.chat(question=prompt, history=None)
         if if_PCA:
