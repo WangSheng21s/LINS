@@ -83,7 +83,7 @@ LINS supports users in building personalized local retrieval databases. Below, w
 
    ```python
    from model.model_LINS import LINS
-   lins = LINS(LLM_name='gpt-4o', 'retriever_name'='text-embedding-3-large', database_name='oncokb')
+   lins = LINS(LLM_name='gpt-4o', retriever_name='text-embedding-3-large', database_name='oncokb')
    response, urls, retrieved_passages, history, sub_questions = lins.MAIRAG(question="What is BCR-ABL1?")
    ```
 
