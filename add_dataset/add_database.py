@@ -102,7 +102,7 @@ def generate_embeddings(local_data_name, retriever):
             for result in (text_embedding_dict):
                 json.dump(result, f, ensure_ascii=False)
                 f.write('\n')
-    del_None(local_data_name=local_data_name)
+    #del_None(local_data_name=local_data_name)
 
 
 
