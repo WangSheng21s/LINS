@@ -11,33 +11,35 @@ We developed LINS, a multi-agent retrieval-augmented framework seamlessly adapta
 
 ## Environmental Preparation
 
-Clone the source code.
+1.Clone the source code.
 ```bash
 git clone https://github.com/WangSheng21s/LINS.git
 cd LINS
 ```
 
-Create a conda environment and activate it.
+2.Create a conda environment and activate it.
 ```bash
 conda create --name LINS python=3.11.6 -c conda-forge
 conda activate LINS
 pip install -r requirements.txt
 ```
 
-Install python requirements.
-Install torch.
+3.Install python requirements.
 
+
+3.1Install torch.
 ```bash
 pip install torch==2.1.0+cu118 torchvision torchaudio -f https://download.pytorch.org/whl/cu118/torch_stable.html
 ```
 
-Install Nodejs.
-
+3.2Install Nodejs.
 ```bash
 apt install nodejs # If you use Ubuntu
 ```
 
-Then, set the environment variable `OPEN_API_KEY`/`GEMINI_KEY` to your key if you want to use Openai/Gemini API./n
+4.Set the environment variable `OPEN_API_KEY`/`GEMINI_KEY` to your key if you want to use Openai/Gemini API.
+
+
 If you want to use Openai API,
 ```bash
 export OPEN_API_KEY=YOUR_KEY
