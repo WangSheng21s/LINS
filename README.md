@@ -11,7 +11,7 @@ We developed LINS, a multi-agent retrieval-augmented framework seamlessly adapta
 
 ## Environmental Preparation
 
-Clone this repo.
+Clone the source code.
 ```bash
 git clone https://github.com/WangSheng21s/LINS.git
 cd LINS
@@ -37,7 +37,7 @@ Install Nodejs.
 apt install nodejs # If you use Ubuntu
 ```
 
-Then, set the environment variable `OPEN_API_KEY`/`GEMINI_KEY` to your key if you want to use Openai/Gemini API.
+Then, set the environment variable `OPEN_API_KEY`/`GEMINI_KEY` to your key if you want to use Openai/Gemini API./n
 If you want to use Openai API,
 ```bash
 export OPEN_API_KEY=YOUR_KEY
