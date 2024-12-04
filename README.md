@@ -12,7 +12,10 @@ We developed LINS, a multi-agent retrieval-augmented framework seamlessly adapta
 ## Environmental Preparation
 
 Clone this repo, and install python requirements.
-
+```bash
+git clone https://github.com/WangSheng21s/LINS.git
+cd LINS
+```
 ```bash
 conda create --name LINS python=3.11.6 -c conda-forge
 conda activate LINS
