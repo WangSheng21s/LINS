@@ -117,4 +117,4 @@ if __name__ == "__main__":
 
     retriever = LINS_Retriever(retriever_name=args.retriever_name, max_thread=args.max_thread, OPEN_API_KEY=args.OPEN_API_KEY, BGE_encoder_path=args.BGE_encoder_path)
     generate_embeddings(args.database_name, retriever=retriever)
-    del_None(args.local_data_name)
+    #del_None(args.database_name)
