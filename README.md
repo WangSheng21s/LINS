@@ -17,7 +17,6 @@ Clone this repo, and install python requirements.
 conda create --name LINS python=3.11.6 -c conda-forge
 conda activate LINS
 pip install -r requirements.txt
-conda install -c pytorch faiss-gpu
 ```
 
 Install torch
@@ -34,7 +33,7 @@ apt install nodejs # If you use Ubuntu
 Then, set the environment variable `OPEN_API_KEY`/`GEMINI_KEY` to your key if you want to use Openai/Gemini API.
 
 ```bash
-export OPEN_API_KEY_KEY=YOUR_KEY
+export OPEN_API_KEY=YOUR_KEY
 export GEMINI_KEY=YOUR_KEY
 ```
 
