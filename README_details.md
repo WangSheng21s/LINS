@@ -99,7 +99,7 @@ This setup ensures that all operations are performed locally, without any data l
 ## Usage-Examples
 We provide examples of the main use cases of LINS, utilizing the GPT-4o LLM, the `text-embedding-3-large` retriever, and the PubMed retrieval database. Please ensure you set the environment variable beforehand: 
 ```bash
-export OPENAI_API_KEY=YOUR_KEY
+export OPEN_API_KEY=YOUR_KEY
 ```
 ```bash
 from model.model_LINS import LINS
