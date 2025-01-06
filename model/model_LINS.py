@@ -146,7 +146,7 @@ class LINS:
                         print("data found")
                         print(data_list['urls'])
                     break
-
+                break
             except Exception as e:
                 print(e)
                 continue
