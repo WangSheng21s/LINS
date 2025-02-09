@@ -22,4 +22,4 @@ accelerate
 ollama
 google-generativeai
 FlagEmbedding
-peft
+peft==0.10.0
