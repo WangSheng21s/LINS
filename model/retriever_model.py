@@ -3,17 +3,45 @@ from model.utils import run_batch_jobs
 import torch
 from FlagEmbedding import BGEM3FlagModel
 import os
+import openai
 
 class Text_embedding_3_large:
     def __init__(self, max_thread=100, OPEN_API_KEY=os.environ.get("OPEN_API_KEY")):
         self.client = OpenAI(api_key=OPEN_API_KEY)
         self.max_thread = max_thread
 
-    def get_embedding(self, text):
+    #def get_embedding(self, text):
+    #    text = text.replace("\n", " ")
+    #    return self.client.embeddings.create(input = [text], model='text-embedding-3-large').data[0].embedding
+
+    def get_embedding(self, text):#add error handling
         text = text.replace("\n", " ")
-        return self.client.embeddings.create(input = [text], model='text-embedding-3-large').data[0].embedding
-    
+        try:
+            response = self.client.embeddings.create(
+                input=[text], 
+                model='text-embedding-3-large'
+            )
+            # 检查返回数据是否合法
+            if not response.data or not response.data[0].embedding:
+                raise ValueError("API returned empty embedding")
+            return response.data[0].embedding
+        except openai.AuthenticationError as e:
+            print("Error: OpenAI authentication failed. Please check your API key")
+            raise
+        except openai.APITimeoutError as e:
+            print("Error: API request timed out. Please check your internet connection")
+            raise
+        except openai.RateLimitError as e:
+            print("Error: Reached API rate limit. Please try again later")
+            raise
+        except openai.APIError as e:
+            print(f"API request failed: {e}")
+            raise
+
     def encode(self, text):
+        #add error handling
+        if not isinstance(text, (str, list)):
+            raise TypeError("Input must be a string or a list of strings")
         if type(text) == str:
             return self.get_embedding(text)
         elif type(text) == list:
@@ -26,32 +54,76 @@ class Text_embedding_3_small:
         self.client = OpenAI(api_key=OPEN_API_KEY)
         self.max_thread = max_thread
 
-    def get_embedding(self, text):
+    def get_embedding(self, text):#add error handling
         text = text.replace("\n", " ")
-        return self.client.embeddings.create(input = [text], model='text-embedding-3-small').data[0].embedding
-    
+        try:
+            response = self.client.embeddings.create(
+                input=[text], 
+                model='text-embedding-3-small'
+            )
+            # 检查返回数据是否合法
+            if not response.data or not response.data[0].embedding:
+                raise ValueError("API returned empty embedding")
+            return response.data[0].embedding
+        except openai.AuthenticationError as e:
+            print("Error: OpenAI authentication failed. Please check your API key")
+            raise
+        except openai.APITimeoutError as e:
+            print("Error: API request timed out. Please check your internet connection")
+            raise
+        except openai.RateLimitError as e:
+            print("Error: Reached API rate limit. Please try again later")
+            raise
+        except openai.APIError as e:
+            print(f"API request failed: {e}")
+            raise
+
     def encode(self, text):
+        #add error handling
+        if not isinstance(text, (str, list)):
+            raise TypeError("Input must be a string or a list of strings")
         if type(text) == str:
             return self.get_embedding(text)
         elif type(text) == list:
             text_embeddings = run_batch_jobs(run_task=self.get_embedding, tasks=text, max_thread=self.max_thread)
             return text_embeddings
-
-
+        
 class Text_embedding_ada_002:
     def __init__(self, max_thread=100, OPEN_API_KEY=os.environ.get("OPEN_API_KEY")):
         self.client = OpenAI(api_key=OPEN_API_KEY)
         self.max_thread = max_thread
 
-    def get_embedding(self, text):
+    def get_embedding(self, text):#add error handling
         text = text.replace("\n", " ")
-        return self.client.embeddings.create(input = [text], model='text-embedding-ada-002').data[0].embedding
-    
+        try:
+            response = self.client.embeddings.create(
+                input=[text], 
+                model='text-embedding-ada-002'
+            )
+            # 检查返回数据是否合法
+            if not response.data or not response.data[0].embedding:
+                raise ValueError("API returned empty embedding")
+            return response.data[0].embedding
+        except openai.AuthenticationError as e:
+            print("Error: OpenAI authentication failed. Please check your API key")
+            raise
+        except openai.APITimeoutError as e:
+            print("Error: API request timed out. Please check your internet connection")
+            raise
+        except openai.RateLimitError as e:
+            print("Error: Reached API rate limit. Please try again later")
+            raise
+        except openai.APIError as e:
+            print(f"API request failed: {e}")
+            raise
+
     def encode(self, text):
-        assert type(text) == str or type(text) == list
+        #add error handling
+        if not isinstance(text, (str, list)):
+            raise TypeError("Input must be a string or a list of strings")
         if type(text) == str:
             return self.get_embedding(text)
-        else:
+        elif type(text) == list:
             text_embeddings = run_batch_jobs(run_task=self.get_embedding, tasks=text, max_thread=self.max_thread)
             return text_embeddings
         
