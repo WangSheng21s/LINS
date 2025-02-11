@@ -420,3 +420,4 @@ class LINS_Database:
             return self.database.get_data_list(question=question, retmax=retmax, if_split_n=if_split_n, if_get_urls=if_get_urls)
         else:
             return self.database.get_data_list(question=question, question_embedding=question_embedding, retmax=retmax)
+            
