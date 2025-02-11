@@ -4,6 +4,8 @@ from model.database import LINS_Database
 from model.utils import run_batch_jobs, get_retrieved_passages
 from model.prompts import return_prompts
 import os, torch, json
+import time
+import openai
 
 prompts_dict = return_prompts()
 
@@ -26,33 +28,71 @@ class LINS:
         self.HERD_pubmed = None
         self.HERD_bing = None
         
+    #@torch.no_grad()
+    #def chat(self, question, history=[], num_retry = 5):
+    #    for i in range(num_retry):
+    #        try:
+    #            response, history = self.model.chat(question, history)
+    #            return response, history
+    #        except Exception as e:
+    #            print(e)
+    #            print("Retrying...")
+    #    print("Failed to get response.")
+    #    return None, []
 
     @torch.no_grad()
-    def chat(self, question, history=[], num_retry = 5):
+    def chat(self, question, history=[], num_retry=5):
         for i in range(num_retry):
             try:
                 response, history = self.model.chat(question, history)
                 return response, history
-            except Exception as e:
-                print(e)
-                print("Retrying...")
-        print("Failed to get response.")
+            except openai.APITimeoutError as e:#add error handling
+                print(f"Timeout error: {e}, retrying ({i+1}/{num_retry})...")
+                time.sleep(2**i)  # 指数退避
+            except openai.AuthenticationError as e:
+                print("Authentication failed. Check API key.")
+                raise
+            except openai.BadRequestError as e:
+                print(f"Bad request: {e}")
+                raise
+        print("Max retries exceeded.")
         return None, []
     
+    #@torch.no_grad()
+    #def assistant_chat(self, question, history=[], num_retry = 5):
+    #    for i in range(num_retry):
+    #        try:
+    #            response, history = self.assistant_model.chat(question, history)
+    #            return response, history
+    #        except Exception as e:
+    #            print(e)
+    #            print("Retrying...")
+    #    print("Failed to get response.")
+    #    return None, []
+
     @torch.no_grad()
-    def assistant_chat(self, question, history=[], num_retry = 5):
+    def assistant_chat(self, question, history=[], num_retry=5):
         for i in range(num_retry):
             try:
                 response, history = self.assistant_model.chat(question, history)
                 return response, history
-            except Exception as e:
-                print(e)
-                print("Retrying...")
-        print("Failed to get response.")
+            except openai.APITimeoutError as e:#add error handling
+                print(f"Timeout error: {e}, retrying ({i+1}/{num_retry})...")
+                time.sleep(2**i)  # 指数退避
+            except openai.AuthenticationError as e:
+                print("Authentication failed. Check API key.")
+                raise
+            except openai.BadRequestError as e:
+                print(f"Bad request: {e}")
+                raise
+        print("Max retries exceeded.")
         return None, []
     
     @torch.no_grad()
     def PRM(self, question:str, refs:list[str]):#passage relevance module
+        #add error handling
+        if not refs:
+            raise ValueError("Empty reference list provided to PRM")
         Passage_Relevance_prompt = prompts_dict["Passage_Relevance_prompt"]
         prompt = Passage_Relevance_prompt
         result = []
@@ -64,6 +104,9 @@ class LINS:
 
     @torch.no_grad()
     def GRM(self, question:str, refs:list[str]):#passage relevance module
+        #add error handling
+        if not refs:
+            raise ValueError("Empty reference list provided to GRM")
         Guideline_Relevance_prompt = prompts_dict["Guideline_Relevance_prompt"]
         prompt = Guideline_Relevance_prompt
         result = []
@@ -128,7 +171,7 @@ class LINS:
                 data_list = KED_database.get_data_list(question=question, retmax=topk, if_split_n=if_split_n)
                 if not data_list or not data_list['texts']:#先用原始问题检索，如果空了，再调用关键词提取退化算法
                     keyword = self.keyword_extraction(question)
-                    #可视化过程
+                    #add error handling
                     print("no data found, using keyword extraction")
                     while not data_list or not data_list['texts']:
                         print("keyword:", keyword)
@@ -140,15 +183,18 @@ class LINS:
                         keyword.pop()
                         keyword = " AND ".join(keyword)
                     if not data_list or not data_list['texts']:
-                        data_list = None
-                        print("no data found")
+                        #add error handling
+                        print("no data found after keyword fallback")
+                        return None
                     else:
                         print("data found")
                         print(data_list['urls'])
                     break
                 break
             except Exception as e:
-                print(e)
+                print(f"Database error: {e}")
+                if "rate limit" in str(e).lower():
+                    time.sleep(10)  # 处理限流
                 continue
         return data_list
     
@@ -426,22 +472,37 @@ class LINS:
 
     @torch.no_grad()
     def Medical_Entity_Extraction(self, text:str, max_extraction_number=4):#return a dict of medical entities
-        Medical_Entity_Extraction_prompt = prompts_dict["Medical_Entity_Extraction_prompt"]
-        prompt = Medical_Entity_Extraction_prompt.format(TEXT=text, MAX_EXTRACTION_NUMBER=max_extraction_number)
-        response, history = self.assistant_chat(question=prompt, history=None)
-        entities = json.loads(response)
-        return entities
+        #add error handling
+        try:
+            Medical_Entity_Extraction_prompt = prompts_dict["Medical_Entity_Extraction_prompt"]
+            prompt = Medical_Entity_Extraction_prompt.format(TEXT=text, MAX_EXTRACTION_NUMBER=max_extraction_number)
+            response, history = self.assistant_chat(question=prompt, history=None)
+            entities = json.loads(response)
+            return entities
+        except json.JSONDecodeError:
+            print("Failed to parse model response as JSON")
+            raise ValueError("Failed to parse model response as JSON")
 
     @torch.no_grad()
-    def Medical_Text_Explanation(self, text:str, max_extraction_number=4, entity_list=[], database=None, topk=2):
+    def Medical_Text_Explanation(self, text:str, max_extraction_number=4, entity_list=[], database=None, topk=2, max_retries=3):
         database = database if database else self.database
         Medical_Text_Explanation_prompt = prompts_dict["Medical_Text_Explanation_prompt"]
 
         if entity_list==[]:
             print("Extracting medical entities...")
-            entity_dict = self.Medical_Entity_Extraction(text, max_extraction_number=max_extraction_number)
-            entity_list = entity_dict['entity_list']
-            print("Entities extracted:", entity_list)
+            #add error handling
+            for _ in range(max_retries):
+                try:
+                    entity_dict = self.Medical_Entity_Extraction(text, max_extraction_number=max_extraction_number)
+                    entity_list = entity_dict['entity_list']
+                    print("Entities extracted:", entity_list)
+                    break
+                except Exception as e:
+                    print(f"Error extracting entities: {e}")
+                    print("Retrying...")
+            #entity_dict = self.Medical_Entity_Extraction(text, max_extraction_number=max_extraction_number)
+            #entity_list = entity_dict['entity_list']
+            #print("Entities extracted:", entity_list)
 
         entity_urls = []
         entity_retrieved_passages = []
