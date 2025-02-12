@@ -16,7 +16,7 @@ class GPTs:
 
 
     def chat(self, message: str, conversation_history: list = None):
-        try:
+        try:#add error handling
             if conversation_history is None:
                 conversation_history = [{"role": "system", "content": "You are a helpful assistant."}]
 
@@ -48,7 +48,7 @@ class Gemini:
         self.model = genai.GenerativeModel(model_name)
 
     def chat(self, message: str, conversation_history: list = None):
-        try:
+        try:#add error handling
             if conversation_history is None:
                 conversation_history = []
             chatone = self.model.start_chat(history=conversation_history)
@@ -74,7 +74,7 @@ class chatllms:
         self.model_name = model_name.lower()
         self.tokenizer = None
         self.model = None
-
+        #add error handling
         if 'qwen' in self.model_name or 'llama' in self.model_name:
             #self._load_local_model()
             pass
@@ -98,7 +98,7 @@ class chatllms:
             raise ValueError(f"Unsupported model name: {self.model_name}")
 
     def _chat_local(self, prompt, history=None, model_name=None):
-        try:
+        try:#add error handling
             if history is None:
                 history = []
             history.append({"role": "user", "content": prompt})
