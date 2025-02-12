@@ -48,7 +48,7 @@ class LINS:
                 return response, history
             except openai.APITimeoutError as e:#add error handling
                 print(f"Timeout error: {e}, retrying ({i+1}/{num_retry})...")
-                time.sleep(2**i)  # 指数退避
+                time.sleep(2**i)  # backoff
             except openai.AuthenticationError as e:
                 print("Authentication failed. Check API key.")
                 raise
@@ -78,7 +78,7 @@ class LINS:
                 return response, history
             except openai.APITimeoutError as e:#add error handling
                 print(f"Timeout error: {e}, retrying ({i+1}/{num_retry})...")
-                time.sleep(2**i)  # 指数退避
+                time.sleep(2**i)  # backoff
             except openai.AuthenticationError as e:
                 print("Authentication failed. Check API key.")
                 raise
