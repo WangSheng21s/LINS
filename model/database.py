@@ -270,6 +270,8 @@ class General_Local_Database:
             self.local_file_path = "./add_dataset/" + database_name +"/" + f"{database_name}_embedding.json"
         else:
             self.local_file_path = local_path + f"{database_name}_embedding.json"
+        #add error handling
+        assert os.path.exists(self.local_file_path)
         self.local_ref_embeddings = None
         self.lical_ref_text = None
         self.database_name = database_name
@@ -420,4 +422,3 @@ class LINS_Database:
             return self.database.get_data_list(question=question, retmax=retmax, if_split_n=if_split_n, if_get_urls=if_get_urls)
         else:
             return self.database.get_data_list(question=question, question_embedding=question_embedding, retmax=retmax)
-            
