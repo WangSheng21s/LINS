@@ -171,6 +171,8 @@ class BGE:
             print(f"Model and tokenizer saved to {self.BGE_encoder_path}")
         except Exception as e:
             print(f"Error downloading the model: {e}")
+            print("Please check your internet connection and try again.")
+            raise
 
 
     def encode(self, text):
