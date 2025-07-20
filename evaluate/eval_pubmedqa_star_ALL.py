@@ -228,7 +228,7 @@ def main():
                         true_correct_number = correct_number
                         true_total_number = total_number
 
-                        for num_try in range(1):
+                        for num_try in range(5):
                             correct_number = true_correct_number#错误之后要回溯
                             total_number = true_total_number
                             try:
