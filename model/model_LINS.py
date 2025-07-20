@@ -57,7 +57,17 @@ class LINS:
                 raise
         print("Max retries exceeded.")
         return None, []
-    
+
+    @torch.no_grad()
+    def chat_for_evaluation(self, question="", history=None, search_results=None, retrieval_passages=None):
+        for i in range(5):
+            try:
+                response, history = self.model.chat(question, history)
+                return response, history
+            except Exception as e:
+                print(e)
+                continue
+
     #@torch.no_grad()
     #def assistant_chat(self, question, history=[], num_retry = 5):
     #    for i in range(num_retry):
@@ -569,3 +579,103 @@ class LINS:
         if not if_QA:
             return {"entity_list":entity_list, "entity_urls":entity_urls, "entity_retrieved_passages":entity_retrieved_passages, "entity_explanations":entity_explanations}
         return {"entity_list":entity_list, "entity_urls":entity_urls, "entity_retrieved_passages":entity_retrieved_passages, "entity_explanations":entity_explanations}, {"QA_response":QA_response, "QA_retrieval_question":QA_retrieval_question, "QA_retrieved_passages":QA_retrieved_passages, "QA_urls":QA_urls}
+
+    @torch.no_grad()
+    def MAIRAG_options(self, 
+                       question, 
+                       topk=5, 
+                       if_pubmed=True, 
+                       if_short_sentences=False, 
+                       local_data_name="", 
+                       itera_num=1, 
+                       history = None,
+                       yuzhi=0.47,
+                       single_choice = True,
+                       search_results = None,
+                       retrieval_passages = None,
+                       if_split_n = False,
+                       recall_top_k = -1,
+                       database = None
+                       ):
+        database = database or self.database
+        sub_questions = []
+        options_prompt = """
+        You are a helpful assistant specialized in single-choice. Provide only the option index ('A', 'B', 'C', or 'D') as the answer to single-choice questions rather than the specific content of the options. Do not include any additional text or explanations. For example, don't say: "Here are the answer".
+        
+        """
+
+        if history:
+            response, history = self.chat(question=question, history=history)
+            return response, [], [], history, sub_questions
+
+        if itera_num > 3:
+            return "None", [], [], None, sub_questions
+        
+        options_prompt_last = options_prompt
+
+        
+        #import pdb; pdb.set_trace()
+        if retrieval_passages:
+            retrieved_passages = retrieval_passages
+            urls = ["None"]* len(retrieved_passages)
+        elif search_results:
+            retrieved_passages = search_results.get("texts", [])
+            urls = search_results.get("urls", [""] * len(retrieved_passages))
+        else:
+            retrieved = self.get_passages(question, topk=topk, if_split_n=if_split_n, recall_top_k=recall_top_k, database=database)
+            if not retrieved or not retrieved.get("texts"):
+                retrieved_passages, urls = [], []
+            else:
+                retrieved_passages = retrieved["texts"]
+                urls = retrieved["urls"]
+    
+        if retrieved_passages:
+            PRM_result = self.PRM(question, retrieved_passages)
+            if 'Gold' in PRM_result:
+                Gold_index = [i for i, result in enumerate(PRM_result) if result == "Gold"]
+                references_str = ''.join(f"[{ix+1}] {retrieved_passages[ix]} \n" for ix in Gold_index)
+                prompt = options_prompt_last + "\n**Retrieved information**\n" + references_str + f"**Question**: {question}\n" + "**Answer:**"
+                response, history = self.chat(question=prompt, history=None)
+                retrieved_passages = [retrieved_passages[ix] for ix in Gold_index]
+                urls = [urls[ix] for ix in Gold_index]
+                #if itera_num == 1:
+                #    sentence = question + " answer:" + response
+                #    coher = self.PCM(sentence, references_str)
+                #    if coher == 'Conflict':
+                #        re_prompt = "The generated sentence is inconsistent with the retrieved paragraph. Please re-answer the question based on the retrieved paragraph but your own knowledge."
+                #        response, history, token_used = self.chat(question=re_prompt, history=history)
+                return response, urls, retrieved_passages, history, []
+
+        print("Retrieved knowledge did not help answer the question. Checking if the model can answer the question using its own knowledge.")
+        SKM_result = self.SKM(question)
+        if 'CERTAIN' in SKM_result:
+            print("Model can answer the question using its own knowledge.")
+            print("question:", question)
+            prompt = options_prompt_last + f"**Question**: {question}\n" + "**Answer:**"
+            response, history = self.chat(question=prompt, history=None)
+            return response, [], [], history, []
+        else:
+            print("Model cannot answer the question using its own knowledge, further iteration needed.")
+            if itera_num == 2:
+                print("Iteration limit reached. No further iterations.")
+                return "None", [], [], None
+        
+            sub_questions = self.QDM(question)
+            retrieved_passages = []
+            urls = []
+            for sub_question in sub_questions:
+                #import pdb; pdb.set_trace()
+                sub_refs = self.get_passages(sub_question, if_split_n=if_split_n, recall_top_k=recall_top_k, database=database)
+                
+                if sub_refs:
+                    for i,ref in enumerate(sub_refs['texts']):
+                        if sub_refs['scores'][i] > yuzhi and ref not in retrieved_passages:
+                            retrieved_passages.append(ref)
+
+                    for i,ref in enumerate(sub_refs['urls']):
+                        if sub_refs['scores'][i] > yuzhi and sub_refs['texts'][i] not in retrieved_passages:
+                            urls.append(ref)
+            references_str = ''.join(f"[{ix+1}] {retrieved_passages[ix]} \n" for ix in range(len(retrieved_passages)))
+            prompt = options_prompt_last + "\n**Retrieved information**\n" + references_str + f"**Question**: {question}\n" + "**Answer:**"
+            response, history = self.chat(question=prompt, history=None)
+            return response, urls, retrieved_passages, history, sub_questions
