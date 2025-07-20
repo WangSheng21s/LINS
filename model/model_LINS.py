@@ -223,7 +223,9 @@ class LINS:
             print("begin filtering most relevant passages")
             device = 'cuda' if torch.cuda.is_available() else 'cpu'
             question_embedding = torch.tensor(self.retriever.encode(question)).to(device)
-            data_list_embedding = torch.tensor(self.retriever.encode(data_list['texts'])).to(device)
+            #import pdb; pdb.set_trace()
+            data_list_text_limit =[tex[:5000] for tex in data_list['texts']] 
+            data_list_embedding = torch.tensor(self.retriever.encode(data_list_text_limit)).to(device)
             scores = torch.matmul(question_embedding, data_list_embedding.T)
             topk=min(topk, len(data_list['texts']))
             topk_indices = torch.topk(scores, topk, dim=0).indices
