@@ -171,7 +171,7 @@ You may use the following command to attempt reproduction of our results:
 
 ```bash
 cd evaluate
-python -m pdb eval_pubmedqastar_ALL.py \
+python eval_pubmedqa_star_ALL.py \
     --model_name_list=gpt-4o-mini \
     --num_batch=1 \
     --task_list=pubmedqa_star \
