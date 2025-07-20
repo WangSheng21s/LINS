@@ -181,5 +181,5 @@ python -m pdb eval_pubmedqastar_ALL.py \
 
 This setup allows the evaluation pipeline to directly use the provided retrieval outputs, reducing fluctuations caused by re-running the retrieval process.
 
-We also provide the original experimental results in `./evaluate/evaluate_results/pubmedqa_star_gpt-4o-mini_MAIRAG__results.jsonl`.
+We also provide the original experimental results (Access : 2024-09-27) in `./evaluate/evaluate_results/pubmedqa_star_gpt-4o-mini_MAIRAG__results.jsonl`.
 
