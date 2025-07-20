@@ -8,7 +8,7 @@ LINS comes with different functionalities.
 - [**Usage Examples**](#usage-examples)
 - [**Privacy Protection Settings**](#privacy-protection-settings)
 - [**Multi-Agent Selection**](#multi-agent-selection)
-- [**Reproducibility**](#Reproducibility
+- [**Reproducibility**](#Reproducibility)
 ## LLM-Selection
 LINS allows users to select the appropriate LLM based on their specific needs. Currently, it supports LLMs from four families: GPT, Gemini, Qwen, and Llama, with plans to continuously update and integrate new LLMs in the future.
 
