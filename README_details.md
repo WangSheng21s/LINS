@@ -8,6 +8,7 @@ LINS comes with different functionalities.
 - [**Usage Examples**](#usage-examples)
 - [**Privacy Protection Settings**](#privacy-protection-settings)
 - [**Multi-Agent Selection**](#multi-agent-selection)
+- [**Reproducibility**](#Reproducibility
 ## LLM-Selection
 LINS allows users to select the appropriate LLM based on their specific needs. Currently, it supports LLMs from four families: GPT, Gemini, Qwen, and Llama, with plans to continuously update and integrate new LLMs in the future.
 
@@ -160,7 +161,7 @@ response, urls, retrieved_passages, history, sub_questions = lins.MAIRAG(questio
 By setting these options to `False`, you will use the original RAG algorithm, resulting in faster responses with reduced token usage and lower overall consumption.
 
 
-### Reproducibility
+## Reproducibility
 
 We provide example commands for reproducing the evaluation results in the `evaluate` section. Due to potential variability introduced by large language model versions, knowledge updates on the web, and inherent model randomness, exact replication of experimental results may show reasonable fluctuations.
 
